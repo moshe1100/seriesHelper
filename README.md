@@ -1,4 +1,4 @@
-seriesHelper
+SeriesHelper
 ============
 
 Series Helper Application

@@ -87,6 +87,7 @@ import util.HttpsClient;
 import util.Util;
 
 public class FXMLButtonController{
+	private static final Color DEFAULT_ROW_FONT_COLOR = new Color(0.2,0.2,0.2,1);
 	@FXML private TableView<Serie> tableView;
 	@FXML private TableColumn<Serie, String> lastEpAiredColumn;
 	@FXML private TableColumn<Serie, String> nameColumn;
@@ -438,6 +439,8 @@ public class FXMLButtonController{
 							Serie serie = (Serie) this.getTableRow().getItem();
 							if (serie.hasAvailableNewEpisode()){								
 								this.setTextFill(Color.BLUE);
+							}else {
+								this.setTextFill(DEFAULT_ROW_FONT_COLOR);
 							}
 							setText(item);
 						}else{
@@ -537,10 +540,10 @@ public class FXMLButtonController{
 
 				@Override
 				public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-					List<TableColumn<Serie, ?>> sortOrder = new ArrayList<>(tableView.getSortOrder());
 					Platform.runLater(new Runnable() {
 				        @Override
 				        public void run() {
+				        	List<TableColumn<Serie, ?>> sortOrder = new ArrayList<>(tableView.getSortOrder());
 				        	tableView.getSortOrder().clear();
 				        	tableView.getSortOrder().addAll(sortOrder);
 				        }

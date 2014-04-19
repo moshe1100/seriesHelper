@@ -161,11 +161,12 @@ public class Serie {
 			
 			Date today = new Date();
 			for (EpisodeData epData : episodesList) {
+				String airDate = dateFormat.format(epData.getAirDate());
 				if (epData.getAirDate().before(today)){
 					this.lastEpisodeAired = epData;
-					lastEpAired = epData.toString();
+					lastEpAired = String.format("%s (%s)", epData.toString(), airDate) ;
 				}else{
-					lastAirDate = dateFormat.format(epData.getAirDate());
+					lastAirDate = airDate;
 					break;
 				}
 			}			

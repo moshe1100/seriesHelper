@@ -67,7 +67,7 @@ public class Main extends Application {
             }
         });
         
-        stage.setTitle("Series Downloader");
+        stage.setTitle("Series Helper");
         stage.setScene(new Scene(root));
         stage.show();
     }

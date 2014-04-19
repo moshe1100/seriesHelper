@@ -20,7 +20,7 @@ import util.Util;
 public class AppConfigurations {
 
 	private static String launchDir = System.getProperty("user.dir");
-	private static String configFileName = "seriesDownloader.txt";
+	private static String configFileName = "seriesHelper.txt";
 
 	private static final String GENERAL_SECTION = "_____________GENERAL_____________";
 	private static final String SERIES_SECTION  = "_____________SERIES______________";

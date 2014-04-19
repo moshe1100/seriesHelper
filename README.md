@@ -1,0 +1,4 @@
+seriesHelper
+============
+
+Series Helper Application

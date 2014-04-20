@@ -39,6 +39,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -52,6 +53,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
@@ -73,10 +77,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import main.properties.AppConfigurations;
 import main.table.Serie;
 import main.table.SerieLastAiredEpisodeFetcher;
@@ -98,6 +105,14 @@ public class FXMLButtonController{
 	@FXML private ComboBox<String> comboBox;
 
 	private List<Serie> allData = null;
+	
+	@FXML private Text statusTime;
+	@FXML private Text nextAiredSeries;
+	@FXML private HBox statusBar;
+	
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.US);
+	
+
 
 	@FXML public void initialize(){
 		initCellRenderers();
@@ -119,6 +134,62 @@ public class FXMLButtonController{
 
 		// Showing "Not Ended" shows by default
 		comboBox.getSelectionModel().select("Not Ended");
+		initStatusBar();
+
+	}
+
+	private void initStatusBar() {
+
+		statusBar.setStyle("-fx-background-color: lightgray");
+
+		// Setting the timer for the clock
+		final Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {  
+			@Override  
+			public void handle(ActionEvent event) {  
+				final Calendar cal = Calendar.getInstance();  
+				statusTime.setText(dateFormat.format(cal.getTime()));
+				
+				if (nextAiredSeries.getText().isEmpty() || cal.get(Calendar.SECOND) == 30){ // every minute or first time
+					handleUpcomingEpisodesStatus();
+				}
+			}
+
+			private void handleUpcomingEpisodesStatus() {
+				List<EpisodeData> nextEpisodesToBeAired = new LinkedList<>();
+				// updating the next series to be aired
+				for (Serie serie : allData){
+					EpisodeData nextEpisodeToBeAiredForSerie = serie.getNextEpisodeToBeAired();
+					if (nextEpisodeToBeAiredForSerie != null){
+						if (nextEpisodesToBeAired.isEmpty()){
+							nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
+						} else {
+							EpisodeData first = nextEpisodesToBeAired.iterator().next();
+							if (first.getAirDate().compareTo(nextEpisodeToBeAiredForSerie.getAirDate()) == 0){
+								// same date - add it to list
+								nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
+							}else if (first.getAirDate().after(nextEpisodeToBeAiredForSerie.getAirDate())){
+								// clear the list - found earlier 
+								nextEpisodesToBeAired.clear();
+								nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
+							}
+						}
+					}
+				}
+				if (!nextEpisodesToBeAired.isEmpty()){	
+					EpisodeData first = nextEpisodesToBeAired.iterator().next();
+					SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy", Locale.US);
+					String nextToBeAiredStatus = "Upcoming episodes (" + format.format(first.getAirDate()) + "): ";
+					for (EpisodeData episodeData : nextEpisodesToBeAired) {
+						nextToBeAiredStatus += episodeData.getSerieName() + " (" + episodeData.toString() + "), ";
+					}
+					nextToBeAiredStatus = nextToBeAiredStatus.substring(0, nextToBeAiredStatus.length()-2);
+					nextAiredSeries.setText(nextToBeAiredStatus);
+				}
+			}  
+		}));  
+		timeline.setCycleCount(Animation.INDEFINITE);  
+		timeline.play(); 
+
 
 	}
 

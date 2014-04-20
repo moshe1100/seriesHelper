@@ -33,6 +33,7 @@ public class Serie {
 	
 	private String pathOnDisk;
 	private String lastEpisodeOnDiskPath;
+	private EpisodeData nextEpisodeToBeAired;
 
 	public Serie(String name, List<EpisodeData> episodesList, String pathOnDisk) {
 		setName(name);
@@ -75,6 +76,10 @@ public class Serie {
 	
 	public List<EpisodeData> getMissingSubsEpisodesList() {
 		return missingSubsEpisodesList;
+	}
+	
+	public EpisodeData getNextEpisodeToBeAired() {
+		return nextEpisodeToBeAired;
 	}
 	
 	public void setNextAirDate(String nextAirDate) {
@@ -167,13 +172,14 @@ public class Serie {
 					lastEpAired = String.format("%s (%s)", epData.toString(), airDate) ;
 				}else{
 					lastAirDate = airDate;
+					this.nextEpisodeToBeAired = epData;
 					break;
 				}
 			}			
 		}
 		
 		setLastEpAired(lastEpAired);
-		setNextAirDate(lastAirDate);
+		setNextAirDate(lastAirDate);		
 	}
 
 	public boolean hasAvailableNewEpisode() {

@@ -13,6 +13,26 @@
 <?import javafx.scene.text.*?>
 
 <BorderPane id="BorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="657.0" prefWidth="896.999977929685" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="main.FXMLButtonController">
+  <bottom>
+    <HBox fx:id="statusBar" prefHeight="24.0" prefWidth="897.0">
+      <children>
+        <Text fx:id="statusTime" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+          <font>
+            <Font size="14.0" fx:id="x1" />
+          </font>
+          <HBox.margin>
+            <Insets left="10.0" />
+          </HBox.margin>
+        </Text>
+        <Separator orientation="VERTICAL" prefHeight="200.0">
+          <HBox.margin>
+            <Insets left="10.0" right="10.0" />
+          </HBox.margin>
+        </Separator>
+        <Text fx:id="nextAiredSeries" font="$x1" strokeType="OUTSIDE" strokeWidth="0.0" text="" />
+      </children>
+    </HBox>
+  </bottom>
   <center>
     <ScrollPane fitToHeight="true" fitToWidth="true" pannable="false" prefHeight="200.0" prefWidth="200.0">
       <content>

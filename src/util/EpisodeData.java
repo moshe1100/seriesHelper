@@ -11,6 +11,8 @@ public class EpisodeData implements Comparable<EpisodeData>{
 	private static Pattern singleEpisodePattern = Pattern.compile("(.*?)[.\\s][sS](\\d{2})[eE](\\d{2}).*");
 	// handle double episode: i.e. Serie.Name.S08E14E15.HDTV.XviD-LOL
 	private static Pattern doubleEpisodePattern = Pattern.compile("(.*?)[.\\s][sS](\\d{2})[eE](\\d{2})[eE](\\d{2}).*");
+	// handle special episode without a number: i.e. Once.Upon.a.Time.S03.Special-Journey.to.Neverland
+	private static Pattern specialEpisodePattern = Pattern.compile("(.*?)[.\\s][sS](\\d{2})[.].*");
 	
 	private String serieName;
 	private int season;
@@ -35,6 +37,7 @@ public class EpisodeData implements Comparable<EpisodeData>{
 		
 		Matcher singleEpisodeMatcher = singleEpisodePattern.matcher(fileName);
 		Matcher doubleEpisodeMatcher = doubleEpisodePattern.matcher(fileName);
+		Matcher specialEpisodeMatcher = specialEpisodePattern.matcher(fileName);
 		if (doubleEpisodeMatcher.matches()){
 			season  = Integer.parseInt(doubleEpisodeMatcher.group(2));
 	        episode = Integer.parseInt(doubleEpisodeMatcher.group(3));
@@ -42,6 +45,9 @@ public class EpisodeData implements Comparable<EpisodeData>{
 		} else if (singleEpisodeMatcher.matches()){
 	    	season  = Integer.parseInt(singleEpisodeMatcher.group(2));
 	        episode = Integer.parseInt(singleEpisodeMatcher.group(3));
+		} else if (specialEpisodeMatcher.matches()){
+	    	season  = Integer.parseInt(specialEpisodeMatcher.group(2));
+	        episode = 0;
 	    }else {
 	    	// Try to get season/episode from 1x02 form
 	    	String currentText = "";

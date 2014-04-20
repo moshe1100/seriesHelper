@@ -510,7 +510,7 @@ public class FXMLButtonController{
 		} else if ("Has Available".equals(selectedItem)){
 			List<Serie> filteredItems = new LinkedList<>();
 			for (Serie serie : allData) {
-				if (serie.hasAvailableNewEpisode()){
+				if (!serie.availableEpForDownloadProperty().get().isEmpty()){
 					filteredItems.add(serie);
 				}
 			}

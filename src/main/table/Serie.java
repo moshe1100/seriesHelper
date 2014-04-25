@@ -1,5 +1,6 @@
 package main.table;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -164,18 +165,24 @@ public class Serie {
 		if (episodesList != null){
 			Collections.sort(episodesList);
 			
-			Date today = new Date();
-			for (EpisodeData epData : episodesList) {
-				String airDate = dateFormat.format(epData.getAirDate());
-				if (epData.getAirDate().before(today)){
-					this.lastEpisodeAired = epData;
-					lastEpAired = String.format("%s (%s)", epData.toString(), airDate) ;
-				}else{
-					lastAirDate = airDate;
-					this.nextEpisodeToBeAired = epData;
-					break;
-				}
-			}			
+			// removing hours/minutes
+			String todayFormatted = dateFormat.format(new Date());
+			try {
+				Date today = dateFormat.parse(todayFormatted);
+				for (EpisodeData epData : episodesList) {
+					String airDate = dateFormat.format(epData.getAirDate());
+					if (epData.getAirDate().before(today)){
+						this.lastEpisodeAired = epData;
+						lastEpAired = String.format("%s (%s)", epData.toString(), airDate) ;
+					}else{
+						lastAirDate = airDate;
+						this.nextEpisodeToBeAired = epData;
+						break;
+					}
+				}			
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		setLastEpAired(lastEpAired);

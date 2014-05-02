@@ -1,5 +1,8 @@
 package main.table;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -249,6 +252,16 @@ public class Serie {
 			missingSubsEpisodes = missingSubsEpisodes.substring(0, missingSubsEpisodes.length()-2);
 		}
 		setMissingSubsEpisodes(missingSubsEpisodes);
+	}
+
+	public void openLastEpisodeLocationOnDisk() {
+		String pathOnDisk = getLastEpisodeOnDiskPath();
+		try {
+			Desktop.getDesktop().open(new File(pathOnDisk));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 

@@ -32,7 +32,6 @@
 
 package main;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -378,12 +377,7 @@ public class FXMLButtonController{
 					@Override
 					public void handle(ActionEvent event) {
 						Serie item = row.getItem();
-						String pathOnDisk = item.getLastEpisodeOnDiskPath();
-						try {
-							Desktop.getDesktop().open(new File(pathOnDisk));
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+						item.openLastEpisodeLocationOnDisk();
 					}
 				});
 				ignoreMissingSubsItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -481,7 +475,23 @@ public class FXMLButtonController{
 					AppConfigurations.getInstance().setGeneralProperty(AppConfigurations.TABLE_SORT_ORDER, Util.getCommaSeparated(lastSortColumnsOrder));
 				}
 			}
-		});				
+		});		
+		
+		// setting comparator for date column
+//		nextEpAirDateColumn.setComparator(new Comparator<String>() {
+//			@Override
+//			public int compare(String o1, String o2) {
+//				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.US);
+//				try {
+//					Date date1 = dateFormat.parse(o1);
+//					Date date2 = dateFormat.parse(o2);
+//					return date1.compareTo(date2);
+//				} catch (ParseException e) {
+//					return 0;
+//				}
+//				
+//			}
+//		});
 	}
 
 	private TableColumn<Serie, ?> getColumnByName(TableView<Serie> tableView, String columnName) {

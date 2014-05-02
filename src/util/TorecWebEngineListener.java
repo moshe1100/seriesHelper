@@ -33,38 +33,41 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 
 		public TorecWebEngineListener(WebEngine webEngine, TorecStage torecStage, Serie serie) {
 			this.webEngine = webEngine;
+			init(torecStage, serie);
+		}
+
+		public void init(TorecStage torecStage, Serie serie) {
 			this.torecStage = torecStage;
 			this.serie = serie;
 		}
-
+		
 		@SuppressWarnings("rawtypes")
 		public void changed(ObservableValue ov, State oldState, State newState) {							
 			if (newState == State.SUCCEEDED) {				
 				if (torecStage == TorecStage.DONE){
+					System.out.println("torecStage == TorecStage.DONE");
+					handleDone();
 					return;
 				}
 				Document doc = webEngine.getDocument();
-				if (torecStage == TorecStage.SEARCH_PAGE){		
+				if (torecStage == TorecStage.SEARCH_PAGE){
+					System.out.println("torecStage == TorecStage.SEARCH_PAGE");
 					handleSearchPage(doc);
 				}else {					
 					StringWriter stringOut = extractHtmlContent(doc);
 					
-					if (torecStage == TorecStage.SEARCH_RESULTS_PAGE){									
+					if (torecStage == TorecStage.SEARCH_RESULTS_PAGE){
+						System.out.println("torecStage == TorecStage.SEARCH_RESULTS_PAGE");
 						handleSearchResultPage(stringOut);
 					} else if (torecStage == TorecStage.SERIES_PAGE){
+						System.out.println("torecStage == TorecStage.SERIES_PAGE");
 						handleSeriesPage(stringOut);
-					} else if (torecStage == TorecStage.DONE){								
-						handleDone();
 					}
 				}
 				
 			} else if (newState == State.FAILED){
-				Platform.runLater(new Runnable() {
-				    @Override
-				    public void run() {
-				    	Main.mainStage.getScene().setCursor(Cursor.DEFAULT);
-				    }
-				});
+				System.out.println("torecStage == TorecStage.FAILED");
+				handleDone();
 			}
 		}
 
@@ -143,6 +146,9 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 				}
 				if (!atleastOneEpisodeFound){
 					HttpsClient.openURL(HttpsClient.torecSerieLink + torecSerieId);
+				}else{
+					// Episode was found - open series location to help downloading the subtitles file to this location
+					serie.openLastEpisodeLocationOnDisk();
 				}
 			}
 			

@@ -110,6 +110,7 @@ public class HttpsClient {
 	}
 
 	private static WebView webview;
+	private static TorecWebEngineListener torecWebEngineListener;
 	
 	public static void openEpGuideLink(Serie serie) {
 		String link = AppConfigurations.getInstance().getSerieProperty(serie.getName(), AppConfigurations.EP_GUIDE_LINK_PROPERTY);
@@ -146,14 +147,19 @@ public class HttpsClient {
 		});
 		
 		try {
+			WebEngine webEngine = null;			
 			if (webview == null){
 				webview = new WebView();
+				webEngine = webview.getEngine();
+				webEngine.setJavaScriptEnabled(true);
+				
+				torecWebEngineListener = new TorecWebEngineListener(webEngine, startTorecStage, serie);
+				webEngine.getLoadWorker().stateProperty().addListener(
+						torecWebEngineListener);
+			}else{
+				webEngine = webview.getEngine();
+				torecWebEngineListener.init(startTorecStage, serie);
 			}
-			final WebEngine webEngine = webview.getEngine();
-			webEngine.setJavaScriptEnabled(true);
-
-			webEngine.getLoadWorker().stateProperty().addListener(
-					new TorecWebEngineListener(webEngine, startTorecStage, serie));
 			webEngine.load(startLink);
 
 		} catch (Exception ex) {

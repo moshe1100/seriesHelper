@@ -6,6 +6,7 @@ _____________SERIES______________
 Agents of SHIELD_EP_GUIDE_LINK=http://epguides.com/AgentsofSHIELD/
 Agents of SHIELD_TOREC_SERIES_ID=1350
 Almost Human_EP_GUIDE_LINK=http://epguides.com/AlmostHuman/
+Almost Human_SERIES_ENDED=true
 Almost Human_TOREC_SERIES_ID=1369
 Black Mirror_EP_GUIDE_LINK=http://epguides.com/BlackMirror/
 Breaking Bad_EP_GUIDE_LINK=http://epguides.com/BreakingBad/

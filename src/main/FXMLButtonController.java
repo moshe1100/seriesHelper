@@ -86,7 +86,6 @@ import javafx.util.Duration;
 import main.properties.AppConfigurations;
 import main.table.Serie;
 import main.table.SerieLastAiredEpisodeFetcher;
-import util.Constants;
 import util.EpisodeData;
 import util.FileUtil;
 import util.HttpsClient;
@@ -416,22 +415,34 @@ public class FXMLButtonController{
 			public int compare(String t, String other) {
 				try{
 					boolean isAscending = nextEpAirDateColumn.getSortType().equals(SortType.ASCENDING);
-					if (Constants.N_A.equals(t) && Constants.N_A.equals(other) ){
-						return 0;
-					}else if (Constants.N_A.equals(t)){						
-						return isAscending ? 1 : -1;
-					}else if (Constants.N_A.equals(other)){
+					if (isDate(t) && isDate(other)){
+						// both dates
+						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.US);
+						Date d1 = dateFormat.parse(t);                
+						Date d2 = dateFormat.parse(other);
+						return Long.compare(d1.getTime(),d2.getTime());
+					}
+					if (isDate(t)){
 						return isAscending ? -1 : 1;
 					}
-					SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.US);
-					Date d1 = dateFormat.parse(t);                
-					Date d2 = dateFormat.parse(other);
-					return Long.compare(d1.getTime(),d2.getTime());
+					if (isDate(other)){
+						return isAscending ? 1 : -1;
+					}
+					return t.compareTo(other);
 				}catch(ParseException p){
 					p.printStackTrace();
 				}
 				return -1;
 
+			}
+			
+			private boolean isDate(String str){
+				int indexOf = str.indexOf("/");
+				if (indexOf != -1){
+					// date should have 2 "/"
+					return str.indexOf("/", indexOf+1) != -1;
+				}
+				return false;
 			}
 
 		});
@@ -477,21 +488,6 @@ public class FXMLButtonController{
 			}
 		});		
 		
-		// setting comparator for date column
-//		nextEpAirDateColumn.setComparator(new Comparator<String>() {
-//			@Override
-//			public int compare(String o1, String o2) {
-//				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.US);
-//				try {
-//					Date date1 = dateFormat.parse(o1);
-//					Date date2 = dateFormat.parse(o2);
-//					return date1.compareTo(date2);
-//				} catch (ParseException e) {
-//					return 0;
-//				}
-//				
-//			}
-//		});
 	}
 
 	private TableColumn<Serie, ?> getColumnByName(TableView<Serie> tableView, String columnName) {

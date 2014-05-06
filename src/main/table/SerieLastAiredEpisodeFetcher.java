@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 import main.properties.AppConfigurations;
+import util.Constants;
 import util.EpisodeData;
 import util.FileUtil;
 import util.HttpsClient;
@@ -41,6 +42,18 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 			String link = getEpisodeGuideLink(name);
 			
 			String readFromUrl = FileUtil.readFromUrl(link);
+			
+			boolean ended = false;
+			// checking if show has ended
+			int statusIndex = readFromUrl.indexOf("class='status'>");
+			if (statusIndex != -1){
+				int statusEndIndex = readFromUrl.indexOf("</span>", statusIndex);
+				String status = readFromUrl.substring(statusIndex + "class='status'>".length(), statusEndIndex);
+				if (status.toLowerCase().contains("ended")){
+					ended = true;
+				}
+			}
+			
 			// Getting only the texts between "<div id="eplist">" and "</div>"
 			int indexOf = readFromUrl.indexOf("<div id=\"eplist\">");
 			int endIndex = readFromUrl.indexOf("</div>", indexOf);
@@ -75,6 +88,9 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 			}
 			
 			serie.calculateLastAired();
+			if (ended){				
+				serie.setNextAirDate(Constants.ENDED);
+			}
 			
 			// getting the available episodes for download (torrents)
 			checkForAvaialbleTorents(serie);

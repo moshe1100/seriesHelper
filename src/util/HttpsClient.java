@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.zip.GZIPInputStream;
 
 import javafx.application.Platform;
 import javafx.scene.Cursor;
@@ -96,7 +97,13 @@ public class HttpsClient {
 		{
 			URL url=new URL(pUrl);
 			HttpURLConnection connection=(HttpURLConnection)url.openConnection();
-			BufferedReader br=new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			BufferedReader br;
+			String headerField = connection.getHeaderField("Content-Encoding");
+			if (headerField != null && headerField.equals("gzip")){
+				br = new BufferedReader(new InputStreamReader(new GZIPInputStream(connection.getInputStream())));            
+	        } else {
+	        	br = new BufferedReader(new InputStreamReader(connection.getInputStream()));            
+	        }  
 			String line;
 			StringBuffer buffer=new StringBuffer();
 			while((line=br.readLine())!=null){

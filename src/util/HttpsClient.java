@@ -167,6 +167,7 @@ public class HttpsClient {
 				webEngine = webview.getEngine();
 				torecWebEngineListener.init(startTorecStage, serie);
 			}
+			Main.setStatusTextOverride("Loading " + startLink);
 			webEngine.load(startLink);
 
 		} catch (Exception ex) {

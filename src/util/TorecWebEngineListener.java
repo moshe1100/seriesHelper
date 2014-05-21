@@ -13,6 +13,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
 import javafx.scene.Cursor;
 import javafx.scene.web.WebEngine;
+import main.FXMLButtonController;
 import main.Main;
 import main.properties.AppConfigurations;
 import main.table.Serie;
@@ -31,6 +32,8 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 		private TorecStage torecStage;
 		private Serie serie;
 
+		FXMLButtonController controller;
+		
 		public TorecWebEngineListener(WebEngine webEngine, TorecStage torecStage, Serie serie) {
 			this.webEngine = webEngine;
 			init(torecStage, serie);
@@ -45,22 +48,22 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 		public void changed(ObservableValue ov, State oldState, State newState) {							
 			if (newState == State.SUCCEEDED) {				
 				if (torecStage == TorecStage.DONE){
-					System.out.println("torecStage == TorecStage.DONE");
 					handleDone();
 					return;
 				}
 				Document doc = webEngine.getDocument();
 				if (torecStage == TorecStage.SEARCH_PAGE){
 					System.out.println("torecStage == TorecStage.SEARCH_PAGE");
+					Main.setStatusTextOverride("Sending search value (" + serie.getName() + ")");					
 					handleSearchPage(doc);
 				}else {					
 					StringWriter stringOut = extractHtmlContent(doc);
 					
 					if (torecStage == TorecStage.SEARCH_RESULTS_PAGE){
-						System.out.println("torecStage == TorecStage.SEARCH_RESULTS_PAGE");
+						System.out.println("torecStage == TorecStage.SEARCH_RESULTS_PAGE");						
 						handleSearchResultPage(stringOut);
 					} else if (torecStage == TorecStage.SERIES_PAGE){
-						System.out.println("torecStage == TorecStage.SERIES_PAGE");
+						System.out.println("torecStage == TorecStage.SERIES_PAGE");						
 						handleSeriesPage(stringOut);
 					}
 				}
@@ -72,10 +75,12 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 		}
 
 		private void handleDone() {
+			System.out.println("torecStage == TorecStage.DONE");
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
 					Main.mainStage.getScene().setCursor(Cursor.DEFAULT);
+					Main.setStatusTextOverride(null);
 				}
 			});
 		}
@@ -87,7 +92,8 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 				// just open the series page instead of opening for each
 				if (torecSerieId != null){
 					torecStage = TorecStage.DONE;
-					HttpsClient.openURL(HttpsClient.torecSerieLink + torecSerieId);
+					HttpsClient.openURL(HttpsClient.torecSerieLink + torecSerieId);					
+					handleDone();
 					return;
 				}
 			}
@@ -141,6 +147,7 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 					Map<Integer, String> episodesLinksMap = episodeToLinkMap.get(episodeData.getSeason());
 					if (episodesLinksMap != null && episodesLinksMap.containsKey(episodeData.getEpisode())){
 						atleastOneEpisodeFound = true;
+						Main.setStatusTextOverride("Found episode subtitles");
 						HttpsClient.openURL(episodesLinksMap.get(episodeData.getEpisode()));
 					}
 				}
@@ -163,7 +170,7 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 			HTMLInputElement item = (HTMLInputElement) elementsByTagName.item(0);
 			item.setValue(serie.getName());
 			webEngine.executeScript("$('#srchForm').submit();");
-			torecStage = TorecStage.DONE;
+			torecStage = TorecStage.SEARCH_RESULTS_PAGE;
 		}
 
 		private void handleSearchResultPage(StringWriter stringOut) {
@@ -182,6 +189,7 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 				// Saving for future
 				AppConfigurations.getInstance().setSerieProperty(serie.getName(), AppConfigurations.TOREC_SERIES_PROPERTY, seriesId);
 				
+				Main.setStatusTextOverride("Found series - loading series page");
 				webEngine.load(link);
 				
 			}

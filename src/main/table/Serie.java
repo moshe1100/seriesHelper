@@ -44,7 +44,7 @@ public class Serie {
 		this.pathOnDisk = pathOnDisk;
 		this.episodesList = episodesList;
 		
-		this.lastEpisodeOnDisk = episodesList.get(episodesList.size()-1);
+		this.lastEpisodeOnDisk = episodesList.isEmpty() ? null : episodesList.get(episodesList.size()-1);
 		lastEpisodeOnDiskPath = lastEpisodeOnDisk == null ? pathOnDisk : lastEpisodeOnDisk.getEpisodeFile().getParent();
 		setLastEpOnDisk(lastEpisodeOnDisk == null ? Constants.N_A : lastEpisodeOnDisk.toString());
 		setLastEpAired(Constants.N_A);
@@ -193,7 +193,10 @@ public class Serie {
 	}
 
 	public boolean hasAvailableNewEpisode() {
-		if (lastEpisodeAired != null && lastEpisodeOnDisk != null){
+		if (lastEpisodeOnDisk == null){
+			return true;
+		}
+		if (lastEpisodeAired != null){
 			return lastEpisodeOnDisk.compareTo(lastEpisodeAired) < 0;
 		}
 		return false;

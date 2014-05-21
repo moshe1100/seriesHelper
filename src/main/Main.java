@@ -45,13 +45,17 @@ import main.properties.AppConfigurations;
 public class Main extends Application {
 	
 	public static Stage mainStage;
+	private static FXMLButtonController controller;
 	
     @Override
     public void start(Stage stage) throws Exception {
     	mainStage = stage;
     	AppConfigurations.getInstance();
     	
-        Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
+    	FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main.fxml"));
+    	Parent root = fxmlLoader.load();
+    	controller = fxmlLoader.getController();
+//      Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
         
         // Set Icon
         stage.getIcons().add(new Image(getClass().getResourceAsStream( "icon.png" ))); 
@@ -72,6 +76,11 @@ public class Main extends Application {
         stage.show();
     }
     
+    public static void setStatusTextOverride(String text){
+    	if (controller != null){
+    		controller.overrideStatusText(text);
+    	}
+    }
     
     
 	public static void main(String[] args) {

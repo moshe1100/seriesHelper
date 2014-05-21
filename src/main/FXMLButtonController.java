@@ -106,12 +106,11 @@ public class FXMLButtonController{
 	
 	@FXML private Text statusTime;
 	@FXML private Text nextAiredSeries;
+	private String overrideStatusText = null;
 	@FXML private HBox statusBar;
 	
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.US);
 	
-
-
 	@FXML public void initialize(){
 		initCellRenderers();
 
@@ -135,6 +134,15 @@ public class FXMLButtonController{
 		initStatusBar();
 
 	}
+	
+	public void overrideStatusText(String text){
+		overrideStatusText = text;
+		if (text == null){
+			handleUpcomingEpisodesStatus();
+		}else{			
+			nextAiredSeries.setText(text);
+		}
+	}
 
 	private void initStatusBar() {
 
@@ -152,44 +160,49 @@ public class FXMLButtonController{
 				}
 			}
 
-			private void handleUpcomingEpisodesStatus() {
-				List<EpisodeData> nextEpisodesToBeAired = new LinkedList<>();
-				// updating the next series to be aired
-				for (Serie serie : allData){
-					EpisodeData nextEpisodeToBeAiredForSerie = serie.getNextEpisodeToBeAired();
-					if (nextEpisodeToBeAiredForSerie != null){
-						if (nextEpisodesToBeAired.isEmpty()){
-							nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
-						} else {
-							EpisodeData first = nextEpisodesToBeAired.iterator().next();
-							if (first.getAirDate().compareTo(nextEpisodeToBeAiredForSerie.getAirDate()) == 0){
-								// same date - add it to list
-								nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
-							}else if (first.getAirDate().after(nextEpisodeToBeAiredForSerie.getAirDate())){
-								// clear the list - found earlier 
-								nextEpisodesToBeAired.clear();
-								nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
-							}
-						}
-					}
-				}
-				if (!nextEpisodesToBeAired.isEmpty()){	
-					EpisodeData first = nextEpisodesToBeAired.iterator().next();
-					SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy", Locale.US);
-					String nextToBeAiredStatus = "Upcoming episodes (" + format.format(first.getAirDate()) + "): ";
-					for (EpisodeData episodeData : nextEpisodesToBeAired) {
-						nextToBeAiredStatus += episodeData.getSerieName() + " (" + episodeData.toString() + "), ";
-					}
-					nextToBeAiredStatus = nextToBeAiredStatus.substring(0, nextToBeAiredStatus.length()-2);
-					nextAiredSeries.setText(nextToBeAiredStatus);
-				}
-			}  
 		}));  
 		timeline.setCycleCount(Animation.INDEFINITE);  
 		timeline.play(); 
 
 
 	}
+	
+	private void handleUpcomingEpisodesStatus() {
+		if (overrideStatusText != null){
+			nextAiredSeries.setText(overrideStatusText);
+			return;
+		}
+		List<EpisodeData> nextEpisodesToBeAired = new LinkedList<>();
+		// updating the next series to be aired
+		for (Serie serie : allData){
+			EpisodeData nextEpisodeToBeAiredForSerie = serie.getNextEpisodeToBeAired();
+			if (nextEpisodeToBeAiredForSerie != null){
+				if (nextEpisodesToBeAired.isEmpty()){
+					nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
+				} else {
+					EpisodeData first = nextEpisodesToBeAired.iterator().next();
+					if (first.getAirDate().compareTo(nextEpisodeToBeAiredForSerie.getAirDate()) == 0){
+						// same date - add it to list
+						nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
+					}else if (first.getAirDate().after(nextEpisodeToBeAiredForSerie.getAirDate())){
+						// clear the list - found earlier 
+						nextEpisodesToBeAired.clear();
+						nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
+					}
+				}
+			}
+		}
+		if (!nextEpisodesToBeAired.isEmpty()){	
+			EpisodeData first = nextEpisodesToBeAired.iterator().next();
+			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy", Locale.US);
+			String nextToBeAiredStatus = "Upcoming episodes (" + format.format(first.getAirDate()) + "): ";
+			for (EpisodeData episodeData : nextEpisodesToBeAired) {
+				nextToBeAiredStatus += episodeData.getSerieName() + " (" + episodeData.toString() + "), ";
+			}
+			nextToBeAiredStatus = nextToBeAiredStatus.substring(0, nextToBeAiredStatus.length()-2);
+			nextAiredSeries.setText(nextToBeAiredStatus);
+		}
+	}  
 
 	private void initRowsActions() {
 		// Adding "Go to Torec"

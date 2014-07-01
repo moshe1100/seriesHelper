@@ -17,7 +17,11 @@ import main.Main;
 import main.properties.AppConfigurations;
 import main.table.Serie;
 
+import org.apache.log4j.Logger;
+
 public class HttpsClient {
+	
+	private static Logger log = Logger.getLogger(HttpsClient.class);
 
 	private final static String apiKey = "AIzaSyBB8nPkgUthwwwlTdTX5YCWr7EMHO4OU0I";
 	private final static String customSearchEngineKey = "000800968141440158892:28g54gwznsc";
@@ -85,6 +89,8 @@ public class HttpsClient {
 		//specify the number of results you need from the starting position
 		toSearch+="&num="+numOfResults;
 
+		log.info("searchEpisodesURL = " + toSearch);
+		
 		return toSearch;
 	}
 

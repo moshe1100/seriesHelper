@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Locale;
 
 import main.properties.AppConfigurations;
+
+import org.apache.log4j.Logger;
+
 import util.Constants;
 import util.EpisodeData;
 import util.FileUtil;
@@ -21,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class SerieLastAiredEpisodeFetcher implements Runnable {
+	private static Logger log = Logger.getLogger(SerieLastAiredEpisodeFetcher.class);
 	
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MMM/yy", Locale.US);
 	
@@ -145,6 +149,9 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 		}
 		// Getting the link for this serie in episode guide by searching the site using google
 		String readFromUrl = HttpsClient.getEpisodesGuideGoogleSearchContent(serieName);
+
+		log.info("Read from EpGuide Search: " + readFromUrl);
+		 
 		
 		BufferedReader reader = new BufferedReader(new StringReader(readFromUrl));
 		Gson gson=new GsonBuilder().create();

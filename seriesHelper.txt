@@ -40,6 +40,7 @@ Silicon Valley_EP_GUIDE_LINK=http://epguides.com/SiliconValley/
 Silicon Valley_TOREC_SERIES_ID=1398
 The Big Bang Theory_EP_GUIDE_LINK=http://epguides.com/BigBangTheory/
 The Big Bang Theory_TOREC_SERIES_ID=231
+The Leftovers_EP_GUIDE_LINK=http://epguides.com/Leftovers/
 The Walking Dead_EP_GUIDE_LINK=http://epguides.com/WalkingDead/
 True Blood_EP_GUIDE_LINK=http://epguides.com/TrueBlood/
 Under the Dome_EP_GUIDE_LINK=http://epguides.com/UndertheDome/

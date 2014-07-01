@@ -42,13 +42,19 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import main.properties.AppConfigurations;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
+
 public class Main extends Application {
+	private static Logger log = Logger.getLogger(Main.class);
 	
 	public static Stage mainStage;
 	private static FXMLButtonController controller;
 	
     @Override
     public void start(Stage stage) throws Exception {
+    	initLog();
+    	
     	mainStage = stage;
     	AppConfigurations.getInstance();
     	
@@ -76,7 +82,16 @@ public class Main extends Application {
         stage.show();
     }
     
-    public static void setStatusTextOverride(String text){
+    private void initLog() {
+    	//DOMConfigurator is used to configure logger from xml configuration file
+        DOMConfigurator.configure("log4j.xml");
+ 
+        //Log in console in and log file
+        log.info("Log4j appender configuration is successful !!");
+		
+	}
+
+	public static void setStatusTextOverride(String text){
     	if (controller != null){
     		controller.overrideStatusText(text);
     	}

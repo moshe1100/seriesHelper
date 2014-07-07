@@ -1,7 +1,7 @@
 _____________GENERAL_____________
 MAGNET_LINK_APPLICATION_PATH=C:\Program Files (x86)\Vuze\Azureus.exe
 SERIES_ROOT_FOLDER=C:\Users\Moshe\Videos\Series
-TABLE_SORT_ORDER=Next Air Date
+TABLE_SORT_ORDER=Name
 _____________SERIES______________
 Agents of SHIELD_EP_GUIDE_LINK=http://epguides.com/AgentsofSHIELD/
 Agents of SHIELD_TOREC_SERIES_ID=1350
@@ -29,6 +29,9 @@ Game of Thrones_TOREC_SERIES_ID=1169
 Grimm_EP_GUIDE_LINK=http://epguides.com/Grimm/
 Grimm_TOREC_SERIES_ID=1231
 Homeland_EP_GUIDE_LINK=http://epguides.com/Homeland/
+House of Cards (2013)_EP_GUIDE_LINK=http://epguides.com/HouseofCards_2013/
+House of Cards_EP_GUIDE_LINK=http://epguides.com/HouseofCards_2013/
+House of Cards_TOREC_SERIES_ID=1315
 House_EP_GUIDE_LINK=http://epguides.com/House/
 House_SERIES_ENDED=true
 How I Met Your Mother_EP_GUIDE_LINK=http://epguides.com/HowIMetYourMother/
@@ -43,6 +46,7 @@ The Big Bang Theory_TOREC_SERIES_ID=231
 The Leftovers_EP_GUIDE_LINK=http://epguides.com/Leftovers/
 The Walking Dead_EP_GUIDE_LINK=http://epguides.com/WalkingDead/
 True Blood_EP_GUIDE_LINK=http://epguides.com/TrueBlood/
+True Blood_TOREC_SERIES_ID=313
 Under the Dome_EP_GUIDE_LINK=http://epguides.com/UndertheDome/
 Weeds_EP_GUIDE_LINK=http://epguides.com/Weeds/
 Weeds_SERIES_ENDED=true

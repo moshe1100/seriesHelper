@@ -173,8 +173,12 @@ public class Serie {
 			try {
 				Date today = dateFormat.parse(todayFormatted);
 				for (EpisodeData epData : episodesList) {
-					String airDate = dateFormat.format(epData.getAirDate());
-					if (epData.getAirDate().before(today)){
+					Date episodeAirDate = epData.getAirDate();
+					if (episodeAirDate == null){
+						continue;
+					}
+					String airDate = dateFormat.format(episodeAirDate);
+					if (episodeAirDate.before(today)){
 						this.lastEpisodeAired = epData;
 						lastEpAired = String.format("%s (%s)", epData.toString(), airDate) ;
 					}else{

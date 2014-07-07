@@ -192,6 +192,8 @@ public class TorecWebEngineListener implements ChangeListener<State> {
 				Main.setStatusTextOverride("Found series - loading series page");
 				webEngine.load(link);
 				
+			}else{
+				handleDone(); // Didn't find the serie on torec
 			}
 		}
 

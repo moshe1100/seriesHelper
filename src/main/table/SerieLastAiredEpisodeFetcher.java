@@ -86,7 +86,12 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 					if (!Util.isDigit(airDateStr.charAt(0)) ){ // probably no day (i.e. Sep/14) - adding "01/"
 						airDateStr = "01/" + airDateStr;
 					}
-					Date airDate = dateFormat.parse(airDateStr); // skip production number					
+					Date airDate = null;
+					try{
+						airDate = dateFormat.parse(airDateStr); // skip production number											
+					}catch (Exception ex){
+						airDate = null;
+					}
 					serie.addEpisode(season, epNumber, airDate);
 				}
 			}

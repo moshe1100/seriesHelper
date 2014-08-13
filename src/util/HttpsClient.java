@@ -103,6 +103,7 @@ public class HttpsClient {
 		{
 			URL url=new URL(pUrl);
 			HttpURLConnection connection=(HttpURLConnection)url.openConnection();
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 			BufferedReader br;
 			String headerField = connection.getHeaderField("Content-Encoding");
 			if (headerField != null && headerField.equals("gzip")){

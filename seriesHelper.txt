@@ -41,6 +41,7 @@ Once Upon a Time_TOREC_SERIES_ID=1230
 Sherlock_EP_GUIDE_LINK=http://epguides.com/Sherlock/
 Silicon Valley_EP_GUIDE_LINK=http://epguides.com/SiliconValley/
 Silicon Valley_TOREC_SERIES_ID=1398
+Teen Wolf_EP_GUIDE_LINK=http://epguides.com/TeenWolf/
 The Big Bang Theory_EP_GUIDE_LINK=http://epguides.com/BigBangTheory/
 The Big Bang Theory_TOREC_SERIES_ID=231
 The Leftovers_EP_GUIDE_LINK=http://epguides.com/Leftovers/

@@ -216,32 +216,28 @@ public class FXMLButtonController{
 						cell.itemProperty().addListener(new ChangeListener<String>() {
 							@Override
 							public void changed(ObservableValue<? extends String> obs, String oldValue, String newValue) {
-								if (newValue != null && !newValue.isEmpty()) {
-									final ContextMenu cellMenu = new ContextMenu();
-									final MenuItem openTorecMenuItem = new MenuItem("Go to Torec");
-									openTorecMenuItem.setOnAction(new EventHandler<ActionEvent>(){
-										@Override
-										public void handle(ActionEvent event) {
-											Serie serie = (Serie) cell.getTableRow().getItem();
-											
-											HttpsClient.openTorecSeriesLink(serie);
-										}
-
-									});
-									cellMenu.getItems().add(openTorecMenuItem);
-
-									// "Borrow" menu items from table's context menu,
-									// if there is one.
-									final ContextMenu tableRowMenu = cell.getTableRow().getContextMenu();
-									if (tableRowMenu != null) {
-										cellMenu.getItems().add(new SeparatorMenuItem());
-										cellMenu.getItems().addAll(tableRowMenu.getItems());
+								final ContextMenu cellMenu = new ContextMenu();
+								final MenuItem openTorecMenuItem = new MenuItem("Go to Torec");
+								openTorecMenuItem.setOnAction(new EventHandler<ActionEvent>(){
+									@Override
+									public void handle(ActionEvent event) {
+										Serie serie = (Serie) cell.getTableRow().getItem();
+										
+										HttpsClient.openTorecSeriesLink(serie);
 									}
-
-									cell.setContextMenu(cellMenu);
-								} else {
-									cell.setContextMenu(null);
+									
+								});
+								cellMenu.getItems().add(openTorecMenuItem);
+								
+								// "Borrow" menu items from table's context menu,
+								// if there is one.
+								final ContextMenu tableRowMenu = cell.getTableRow().getContextMenu();
+								if (tableRowMenu != null) {
+									cellMenu.getItems().add(new SeparatorMenuItem());
+									cellMenu.getItems().addAll(tableRowMenu.getItems());
 								}
+								
+								cell.setContextMenu(cellMenu);								
 							} 
 						});
 						return cell;
@@ -259,32 +255,28 @@ public class FXMLButtonController{
 						cell.itemProperty().addListener(new ChangeListener<String>() {
 							@Override
 							public void changed(ObservableValue<? extends String> obs, String oldValue, String newValue) {
-								if (newValue != null && !newValue.isEmpty()) {
-									final ContextMenu cellMenu = new ContextMenu();
-									final MenuItem openEpGuideMenuItem = new MenuItem("Go to Episodes Guide");
-									openEpGuideMenuItem.setOnAction(new EventHandler<ActionEvent>(){
-										@Override
-										public void handle(ActionEvent event) {
-											Serie serie = (Serie) cell.getTableRow().getItem();
-
-											HttpsClient.openEpGuideLink(serie);
-										}
-
-									});
-									cellMenu.getItems().add(openEpGuideMenuItem);
-
-									// "Borrow" menu items from table's context menu,
-									// if there is one.
-									final ContextMenu tableRowMenu = cell.getTableRow().getContextMenu();
-									if (tableRowMenu != null) {
-										cellMenu.getItems().add(new SeparatorMenuItem());
-										cellMenu.getItems().addAll(tableRowMenu.getItems());
+								final ContextMenu cellMenu = new ContextMenu();
+								final MenuItem openEpGuideMenuItem = new MenuItem("Go to Episodes Guide");
+								openEpGuideMenuItem.setOnAction(new EventHandler<ActionEvent>(){
+									@Override
+									public void handle(ActionEvent event) {
+										Serie serie = (Serie) cell.getTableRow().getItem();
+										
+										HttpsClient.openEpGuideLink(serie);
 									}
-
-									cell.setContextMenu(cellMenu);
-								} else {
-									cell.setContextMenu(null);
+									
+								});
+								cellMenu.getItems().add(openEpGuideMenuItem);
+								
+								// "Borrow" menu items from table's context menu,
+								// if there is one.
+								final ContextMenu tableRowMenu = cell.getTableRow().getContextMenu();
+								if (tableRowMenu != null) {
+									cellMenu.getItems().add(new SeparatorMenuItem());
+									cellMenu.getItems().addAll(tableRowMenu.getItems());
 								}
+								
+								cell.setContextMenu(cellMenu);
 							} 
 						});
 						return cell;
@@ -302,65 +294,49 @@ public class FXMLButtonController{
 						cell.itemProperty().addListener(new ChangeListener<String>() {
 							@Override
 							public void changed(ObservableValue<? extends String> obs, String oldValue, String newValue) {
-								if (newValue != null && !newValue.isEmpty()) {
-									final ContextMenu cellMenu = new ContextMenu();
-									final MenuItem downloadMenuItem = new MenuItem("Download Available Episodes");
-									final MenuItem browserMenuItem = new MenuItem("Open In Browser");
-									downloadMenuItem.setOnAction(new EventHandler<ActionEvent>(){
-										@Override
-										public void handle(ActionEvent event) {
-											performDownloadAction(cell);
+								final ContextMenu cellMenu = new ContextMenu();
+								final MenuItem downloadMenuItem = new MenuItem("Download Available Episodes");
+								final MenuItem browserMenuItem = new MenuItem("Open In Browser");
+								downloadMenuItem.setOnAction(new EventHandler<ActionEvent>(){
+									@Override
+									public void handle(ActionEvent event) {
+										performDownloadAction(cell);
+									}
+									
+									private void performDownloadAction(final TableCell<Serie, String> cell) {
+										Serie serie = (Serie) cell.getTableRow().getItem();
+										downloadAllSeriesCandidates(serie);
+									}
+								});
+								browserMenuItem.setOnAction(new EventHandler<ActionEvent>(){
+									@Override
+									public void handle(ActionEvent event) {
+										Serie serie = (Serie) cell.getTableRow().getItem();
+										List<EpisodeData> candidates = serie.getDownloadEpisodesCandidates();
+										EpisodeData episodeData = null;
+										if (candidates.isEmpty()) {
+											episodeData = serie.getNextEpisodeToBeAired();
+										} else {											
+											episodeData = candidates.get(candidates.size()-1);
 										}
-
-										private void performDownloadAction(final TableCell<Serie, String> cell) {
-											Serie serie = (Serie) cell.getTableRow().getItem();
-											List<EpisodeData> downloadEpisodesCandidates = serie.getDownloadEpisodesCandidates();
-											String appPath = AppConfigurations.getInstance().getGeneralProperty(AppConfigurations.MAGNET_LINK_APPLICATION_SERIES_PROPERTY);
-											if (appPath == null){
-												FileChooser fileChooser = new FileChooser();
-												fileChooser.setTitle("Locate Bittorrent Application");
-												File showOpenDialog = fileChooser.showOpenDialog(Main.mainStage);
-												if (showOpenDialog == null){
-													return;
-												}
-												appPath = showOpenDialog.getPath();
-												AppConfigurations.getInstance().setGeneralProperty(AppConfigurations.MAGNET_LINK_APPLICATION_SERIES_PROPERTY, appPath);
-											}
-											for (EpisodeData episodeData : downloadEpisodesCandidates) {
-												String[] command = {appPath, "\"" + episodeData.getMagnetLink() + "\""};
-												try {
-													Runtime.getRuntime().exec(command);
-												} catch (IOException e) {
-													e.printStackTrace();
-												}
-											}
-										}
-									});
-									browserMenuItem.setOnAction(new EventHandler<ActionEvent>(){
-										@Override
-										public void handle(ActionEvent event) {
-											Serie serie = (Serie) cell.getTableRow().getItem();
-											List<EpisodeData> candidates = serie.getDownloadEpisodesCandidates();
-											EpisodeData episodeData = candidates.get(candidates.size()-1);
+										if (episodeData != null) {											
 											String pirateBaySearchLink = HttpsClient.makePirateBaySearchString(episodeData);
 											HttpsClient.openURL(pirateBaySearchLink);
 										}
-									});									
-									cellMenu.getItems().add(downloadMenuItem);
-									cellMenu.getItems().add(browserMenuItem);
-
-									final ContextMenu tableRowMenu = cell.getTableRow().getContextMenu();
-									if (tableRowMenu != null) {
-										cellMenu.getItems().add(new SeparatorMenuItem());
-										cellMenu.getItems().addAll(tableRowMenu.getItems());
 									}
-
-									// "Borrow" menu items from table's context menu,
-									// if there is one.
-									cell.setContextMenu(cellMenu);
-								} else {
-									cell.setContextMenu(null);
+								});									
+								cellMenu.getItems().add(downloadMenuItem);
+								cellMenu.getItems().add(browserMenuItem);
+								
+								final ContextMenu tableRowMenu = cell.getTableRow().getContextMenu();
+								if (tableRowMenu != null) {
+									cellMenu.getItems().add(new SeparatorMenuItem());
+									cellMenu.getItems().addAll(tableRowMenu.getItems());
 								}
+								
+								// "Borrow" menu items from table's context menu,
+								// if there is one.
+								cell.setContextMenu(cellMenu);
 							} 
 						});
 						return cell;
@@ -555,6 +531,13 @@ public class FXMLButtonController{
 		initTable(true);
 		handleComboBoxAction();
 	}
+	
+	@FXML protected void handleDownloadAllButtonAction(ActionEvent event) {		
+		ObservableList<Serie> items = tableView.getItems();
+		for (Serie serie : items) {
+			downloadAllSeriesCandidates(serie);
+		}
+	}
 
 	@FXML protected void handleAboutButtonAction(ActionEvent event) {
 		Parent root;
@@ -701,6 +684,32 @@ public class FXMLButtonController{
 			}else if (FileUtil.isSubtitlesFile(file)){
 				// remove suffix
 				subtitleFileNames.add(FileUtil.removeFileSuffix(file.getName(), ".HEB").toLowerCase());
+			}
+		}
+	}
+
+	private void downloadAllSeriesCandidates(Serie serie) {		
+		List<EpisodeData> downloadEpisodesCandidates = serie.getDownloadEpisodesCandidates();
+		if (downloadEpisodesCandidates.isEmpty()) {
+			return;
+		}
+		String appPath = AppConfigurations.getInstance().getGeneralProperty(AppConfigurations.MAGNET_LINK_APPLICATION_SERIES_PROPERTY);
+		if (appPath == null){
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle("Locate Bittorrent Application");
+			File showOpenDialog = fileChooser.showOpenDialog(Main.mainStage);
+			if (showOpenDialog == null){
+				return;
+			}
+			appPath = showOpenDialog.getPath();
+			AppConfigurations.getInstance().setGeneralProperty(AppConfigurations.MAGNET_LINK_APPLICATION_SERIES_PROPERTY, appPath);
+		}
+		for (EpisodeData episodeData : downloadEpisodesCandidates) {
+			String[] command = {appPath, "\"" + episodeData.getMagnetLink() + "\""};
+			try {
+				Runtime.getRuntime().exec(command);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}

@@ -5,7 +5,7 @@ import javafx.scene.text.Text;
 
 public class FXMLAboutController {
 
-	private static final String VERSION = "1.0";
+	private static final String VERSION = "1.1";
 	
 	@FXML private Text versionValue;
 	

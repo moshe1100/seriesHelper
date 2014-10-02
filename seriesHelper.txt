@@ -1,7 +1,7 @@
 _____________GENERAL_____________
 MAGNET_LINK_APPLICATION_PATH=C:\Program Files (x86)\Vuze\Azureus.exe
 SERIES_ROOT_FOLDER=C:\Users\Moshe\Videos\Series
-TABLE_SORT_ORDER=Next Air Date
+TABLE_SORT_ORDER=Available Episodes for Download
 _____________SERIES______________
 Agents of SHIELD_EP_GUIDE_LINK=http://epguides.com/AgentsofSHIELD/
 Agents of SHIELD_TOREC_SERIES_ID=1350

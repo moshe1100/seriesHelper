@@ -86,12 +86,18 @@ import javafx.util.Duration;
 import main.properties.AppConfigurations;
 import main.table.Serie;
 import main.table.SerieLastAiredEpisodeFetcher;
+
+import org.apache.log4j.Logger;
+
 import util.EpisodeData;
 import util.FileUtil;
 import util.HttpsClient;
 import util.Util;
 
 public class FXMLButtonController{
+	@SuppressWarnings("unused")
+	private static Logger log = Logger.getLogger(FXMLButtonController.class);
+	
 	private static final Color DEFAULT_ROW_FONT_COLOR = new Color(0.2,0.2,0.2,1);
 	@FXML private TableView<Serie> tableView;
 	@FXML private TableColumn<Serie, String> lastEpAiredColumn;
@@ -205,145 +211,8 @@ public class FXMLButtonController{
 	}  
 
 	private void initRowsActions() {
-		// Adding "Go to Torec"
-		missingSubsEpColumn.setCellFactory(
-				new Callback<TableColumn<Serie, String>, TableCell<Serie, String>>() {  
-					@Override
-					public TableCell<Serie, String> call(TableColumn<Serie, String> col) {
 
-						final TableCell<Serie, String> cell = new TableCell<>();
-						cell.textProperty().bind(cell.itemProperty());
-						cell.itemProperty().addListener(new ChangeListener<String>() {
-							@Override
-							public void changed(ObservableValue<? extends String> obs, String oldValue, String newValue) {
-								final ContextMenu cellMenu = new ContextMenu();
-								final MenuItem openTorecMenuItem = new MenuItem("Go to Torec");
-								openTorecMenuItem.setOnAction(new EventHandler<ActionEvent>(){
-									@Override
-									public void handle(ActionEvent event) {
-										Serie serie = (Serie) cell.getTableRow().getItem();
-										
-										HttpsClient.openTorecSeriesLink(serie);
-									}
-									
-								});
-								cellMenu.getItems().add(openTorecMenuItem);
-								
-								// "Borrow" menu items from table's context menu,
-								// if there is one.
-								final ContextMenu tableRowMenu = cell.getTableRow().getContextMenu();
-								if (tableRowMenu != null) {
-									cellMenu.getItems().add(new SeparatorMenuItem());
-									cellMenu.getItems().addAll(tableRowMenu.getItems());
-								}
-								
-								cell.setContextMenu(cellMenu);								
-							} 
-						});
-						return cell;
-					}
-				});
-
-		// Adding "Go to Episodes Guide"
-		nextEpAirDateColumn.setCellFactory(
-				new Callback<TableColumn<Serie, String>, TableCell<Serie, String>>() {  
-					@Override
-					public TableCell<Serie, String> call(TableColumn<Serie, String> col) {
-
-						final TableCell<Serie, String> cell = new TableCell<>();
-						cell.textProperty().bind(cell.itemProperty());
-						cell.itemProperty().addListener(new ChangeListener<String>() {
-							@Override
-							public void changed(ObservableValue<? extends String> obs, String oldValue, String newValue) {
-								final ContextMenu cellMenu = new ContextMenu();
-								final MenuItem openEpGuideMenuItem = new MenuItem("Go to Episodes Guide");
-								openEpGuideMenuItem.setOnAction(new EventHandler<ActionEvent>(){
-									@Override
-									public void handle(ActionEvent event) {
-										Serie serie = (Serie) cell.getTableRow().getItem();
-										
-										HttpsClient.openEpGuideLink(serie);
-									}
-									
-								});
-								cellMenu.getItems().add(openEpGuideMenuItem);
-								
-								// "Borrow" menu items from table's context menu,
-								// if there is one.
-								final ContextMenu tableRowMenu = cell.getTableRow().getContextMenu();
-								if (tableRowMenu != null) {
-									cellMenu.getItems().add(new SeparatorMenuItem());
-									cellMenu.getItems().addAll(tableRowMenu.getItems());
-								}
-								
-								cell.setContextMenu(cellMenu);
-							} 
-						});
-						return cell;
-					}
-				});
-		
-		// Adding "Download Avaialble Episodes" and "Open in Browser"
-		availableEpForDownloadColumn.setCellFactory(
-				new Callback<TableColumn<Serie, String>, TableCell<Serie, String>>() {  
-					@Override
-					public TableCell<Serie, String> call(TableColumn<Serie, String> col) {
-
-						final TableCell<Serie, String> cell = new TableCell<>();
-						cell.textProperty().bind(cell.itemProperty());
-						cell.itemProperty().addListener(new ChangeListener<String>() {
-							@Override
-							public void changed(ObservableValue<? extends String> obs, String oldValue, String newValue) {
-								final ContextMenu cellMenu = new ContextMenu();
-								final MenuItem downloadMenuItem = new MenuItem("Download Available Episodes");
-								final MenuItem browserMenuItem = new MenuItem("Open In Browser");
-								downloadMenuItem.setOnAction(new EventHandler<ActionEvent>(){
-									@Override
-									public void handle(ActionEvent event) {
-										performDownloadAction(cell);
-									}
-									
-									private void performDownloadAction(final TableCell<Serie, String> cell) {
-										Serie serie = (Serie) cell.getTableRow().getItem();
-										downloadAllSeriesCandidates(serie);
-									}
-								});
-								browserMenuItem.setOnAction(new EventHandler<ActionEvent>(){
-									@Override
-									public void handle(ActionEvent event) {
-										Serie serie = (Serie) cell.getTableRow().getItem();
-										List<EpisodeData> candidates = serie.getDownloadEpisodesCandidates();
-										EpisodeData episodeData = null;
-										if (candidates.isEmpty()) {
-											episodeData = serie.getNextEpisodeToBeAired();
-										} else {											
-											episodeData = candidates.get(candidates.size()-1);
-										}
-										if (episodeData != null) {											
-											String pirateBaySearchLink = HttpsClient.makePirateBaySearchString(episodeData);
-											HttpsClient.openURL(pirateBaySearchLink);
-										}
-									}
-								});									
-								cellMenu.getItems().add(downloadMenuItem);
-								cellMenu.getItems().add(browserMenuItem);
-								
-								final ContextMenu tableRowMenu = cell.getTableRow().getContextMenu();
-								if (tableRowMenu != null) {
-									cellMenu.getItems().add(new SeparatorMenuItem());
-									cellMenu.getItems().addAll(tableRowMenu.getItems());
-								}
-								
-								// "Borrow" menu items from table's context menu,
-								// if there is one.
-								cell.setContextMenu(cellMenu);
-							} 
-						});
-						return cell;
-					}
-				});
-
-		// Adding "Open Series Location"
+		// Adding Actions
 		tableView.setRowFactory(new Callback<TableView<Serie>, TableRow<Serie>>() {
 			@Override
 			public TableRow<Serie> call(TableView<Serie> tableView) {
@@ -361,6 +230,14 @@ public class FXMLButtonController{
 				MenuItem openItem = new MenuItem("Open Series Location");
 				MenuItem ignoreMissingSubsItem = new MenuItem("Ignore Missing Subs");
 				MenuItem markAsEndedItem = new MenuItem("Mark/Unmark as Ended");
+				
+				// Adding "Go to Torec"
+				addGoToTorecAction(row, rowMenu);
+				// Adding "Go to Episodes Guide"
+				addGoToEpGuideAction(row, rowMenu);
+				// Adding "Download Available Episodes" and "Open in Browser"
+				addDownloadActions(row, rowMenu);
+				
 				openItem.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
@@ -387,11 +264,75 @@ public class FXMLButtonController{
 				rowMenu.getItems().addAll(openItem, ignoreMissingSubsItem, markAsEndedItem);
 
 				// only display context menu for non-null items:
-				row.contextMenuProperty().bind(
-						Bindings.when(Bindings.isNotNull(row.itemProperty()))
-						.then(rowMenu)
-						.otherwise((ContextMenu)null));
+				row.contextMenuProperty().bind(  
+                        Bindings.when(row.emptyProperty())  
+                        .then((ContextMenu)null)  
+                        .otherwise(rowMenu)  
+                ); 
 				return row;
+			}
+
+			private void addGoToTorecAction(final TableRow<Serie> row,
+					final ContextMenu rowMenu) {
+				final MenuItem openTorecMenuItem = new MenuItem("Go to Torec");
+				openTorecMenuItem.setOnAction(new EventHandler<ActionEvent>(){
+					@Override
+					public void handle(ActionEvent event) {
+						Serie serie = row.getItem();
+						
+						HttpsClient.openTorecSeriesLink(serie);
+					}
+					
+				});
+				rowMenu.getItems().add(openTorecMenuItem);
+				rowMenu.getItems().add(new SeparatorMenuItem());
+			}
+			
+			private void addGoToEpGuideAction(final TableRow<Serie> row, final ContextMenu rowMenu) {
+				final MenuItem openEpGuideMenuItem = new MenuItem("Go to Episodes Guide");
+				openEpGuideMenuItem.setOnAction(new EventHandler<ActionEvent>(){
+					@Override
+					public void handle(ActionEvent event) {
+						Serie serie = row.getItem();
+						
+						HttpsClient.openEpGuideLink(serie);
+					}
+					
+				});
+				rowMenu.getItems().add(openEpGuideMenuItem);
+				rowMenu.getItems().add(new SeparatorMenuItem());
+			}
+			
+			private void addDownloadActions(final TableRow<Serie> row, final ContextMenu rowMenu) {
+				final MenuItem downloadMenuItem = new MenuItem("Download Available Episodes");
+				final MenuItem browserMenuItem = new MenuItem("Open In Browser");
+				downloadMenuItem.setOnAction(new EventHandler<ActionEvent>(){
+					@Override
+					public void handle(ActionEvent event) {
+						Serie serie = row.getItem();
+						downloadAllSeriesCandidates(serie);
+					}
+				});
+				browserMenuItem.setOnAction(new EventHandler<ActionEvent>(){
+					@Override
+					public void handle(ActionEvent event) {
+						Serie serie = row.getItem();
+						List<EpisodeData> candidates = serie.getDownloadEpisodesCandidates();
+						EpisodeData episodeData = null;
+						if (candidates.isEmpty()) {
+							episodeData = serie.getNextEpisodeToBeAired();
+						} else {											
+							episodeData = candidates.get(candidates.size()-1);
+						}
+						if (episodeData != null) {											
+							String pirateBaySearchLink = HttpsClient.makePirateBaySearchString(episodeData);
+							HttpsClient.openURL(pirateBaySearchLink);
+						}
+					}
+				});									
+				rowMenu.getItems().add(downloadMenuItem);
+				rowMenu.getItems().add(browserMenuItem);
+				rowMenu.getItems().add(new SeparatorMenuItem());
 			}
 		});
 	}

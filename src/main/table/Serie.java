@@ -231,7 +231,7 @@ public class Serie {
 	
 	public boolean hasUnwatchedEpisode() {
 		if (lastEpisodeOnDisk != null && lastEpisodeWatchedData != null){
-			return lastEpisodeOnDisk.compareTo(lastEpisodeAired) > 0;
+			return lastEpisodeOnDisk.compareTo(lastEpisodeWatchedData) > 0;
 		}
 		return false;
 	}

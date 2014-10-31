@@ -31,6 +31,7 @@ Friends_SERIES_ENDED=true
 Game of Thrones_EP_GUIDE_LINK=http://epguides.com/GameofThrones/
 Game of Thrones_TOREC_SERIES_ID=1169
 Grimm_EP_GUIDE_LINK=http://epguides.com/Grimm/
+Grimm_SERIES_LAST_EP_WATCHED=S03E22
 Grimm_TOREC_SERIES_ID=1231
 Homeland_EP_GUIDE_LINK=http://epguides.com/Homeland/
 House of Cards (2013)_EP_GUIDE_LINK=http://epguides.com/HouseofCards_2013/

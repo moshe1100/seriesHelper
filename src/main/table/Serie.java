@@ -26,12 +26,14 @@ public class Serie {
 	private final SimpleStringProperty availableEpForDownload = new SimpleStringProperty("");
 	private final SimpleStringProperty missingSubsEpisodes = new SimpleStringProperty("");
 	private final SimpleBooleanProperty seriesEnded = new SimpleBooleanProperty(false);
+	private final SimpleStringProperty lastEpisodeWatched = new SimpleStringProperty("");
 	
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.US);
 	
 	private EpisodeData lastEpisodeOnDisk;
 	private EpisodeData lastEpisodeAired;
 	private List<EpisodeData> episodesList;
+	private EpisodeData lastEpisodeWatchedData = null;
 	
 	private List<EpisodeData> missingSubsEpisodesList;
 	
@@ -52,6 +54,13 @@ public class Serie {
 		
 		String serieProperty = AppConfigurations.getInstance().getSerieProperty(getName(), AppConfigurations.SERIES_ENDED_PROPERTY);
 		this.seriesEnded.set(Boolean.parseBoolean(serieProperty));
+		
+		String lastEpWatched = AppConfigurations.getInstance().getSerieProperty(getName(), AppConfigurations.SERIES_LAST_EP_WATCHED_PROPERTY);
+		if (lastEpWatched != null) {
+			this.lastEpisodeWatchedData = new EpisodeData(name, lastEpWatched);
+			this.lastEpisodeWatched.set(lastEpisodeWatchedData.toString());
+		}
+		
 	}
 
 	public String getName() {
@@ -62,14 +71,24 @@ public class Serie {
 		this.name.set(name);
 	}
 
-	public String getLastEpOnDisk() {
-		return lastEpOnDisk.get();
+	public EpisodeData getLastEpOnDisk() {
+		return lastEpisodeOnDisk;
 	}
-
+	
 	public void setLastEpOnDisk(String lastEpOnDisk) {
 		this.lastEpOnDisk.set(lastEpOnDisk);
 	}
 
+	public EpisodeData getLastEpisodeWatched() {
+		return lastEpisodeWatchedData;
+	}
+	
+	public void setLastEpisodeWatched(EpisodeData lastEpisodeWatched) {
+		this.lastEpisodeWatchedData = lastEpisodeWatched;
+		this.lastEpisodeWatched.set(lastEpisodeWatched.toString());
+		AppConfigurations.getInstance().setSerieProperty(getName(), AppConfigurations.SERIES_LAST_EP_WATCHED_PROPERTY, this.lastEpisodeWatched.get());
+	}
+	
 	public String getLastEpAired() {
 		return lastEpAired.get();
 	}
@@ -140,6 +159,10 @@ public class Serie {
     	return seriesEnded;
     }
     
+    public SimpleStringProperty lastEpisodeWatchedProperty(){
+    	return lastEpisodeWatched;
+    }
+    
     //////////////////////////////////////////////////////////
 	
     public synchronized void addEpisode(int season, int episode, Date airDate){
@@ -202,6 +225,13 @@ public class Serie {
 		}
 		if (lastEpisodeAired != null){
 			return lastEpisodeOnDisk.compareTo(lastEpisodeAired) < 0;
+		}
+		return false;
+	}
+	
+	public boolean hasUnwatchedEpisode() {
+		if (lastEpisodeOnDisk != null && lastEpisodeWatchedData != null){
+			return lastEpisodeOnDisk.compareTo(lastEpisodeAired) > 0;
 		}
 		return false;
 	}

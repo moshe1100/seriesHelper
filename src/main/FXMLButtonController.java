@@ -1,35 +1,3 @@
-/*
- * Copyright (c) 2011, 2014 Oracle and/or its affiliates.
- * All rights reserved. Use is subject to license terms.
- *
- * This file is available and licensed under the following license:
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the distribution.
- *  - Neither the name of Oracle nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 package main;
 
 import java.io.File;
@@ -80,6 +48,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -104,7 +73,7 @@ public class FXMLButtonController{
 	@FXML private TableColumn<Serie, String> nameColumn;
 	@FXML private TableColumn<Serie, String> nextEpAirDateColumn;
 	@FXML private TableColumn<Serie, String> availableEpForDownloadColumn;
-	@FXML private TableColumn<Serie, String> missingSubsEpColumn;
+	@FXML private TableColumn<Serie, String> lastEpWatchedColumn;
 
 	@FXML private ComboBox<String> comboBox;
 
@@ -230,6 +199,7 @@ public class FXMLButtonController{
 				MenuItem openItem = new MenuItem("Open Series Location");
 				MenuItem ignoreMissingSubsItem = new MenuItem("Ignore Missing Subs");
 				MenuItem markAsEndedItem = new MenuItem("Mark/Unmark as Ended");
+				MenuItem setLastEpWatchedItem = new MenuItem("Set Last Episode Watched");
 				
 				// Adding "Go to Torec"
 				addGoToTorecAction(row, rowMenu);
@@ -261,7 +231,14 @@ public class FXMLButtonController{
 						handleComboBoxAction();
 					}
 				});
-				rowMenu.getItems().addAll(openItem, ignoreMissingSubsItem, markAsEndedItem);
+				setLastEpWatchedItem.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						Serie item = row.getItem();
+						handleSetLastEpisodeWatched(event, item);
+					}
+				});
+				rowMenu.getItems().addAll(openItem, ignoreMissingSubsItem, markAsEndedItem, setLastEpWatchedItem);
 
 				// only display context menu for non-null items:
 				row.contextMenuProperty().bind(  
@@ -458,6 +435,32 @@ public class FXMLButtonController{
 
 			}
 		});
+		// paint in red if last episode watched is smaller then last episode on disk
+		lastEpWatchedColumn.setCellFactory(new Callback<TableColumn<Serie, String>, TableCell<Serie, String>>() {
+
+			@Override
+			public TableCell<Serie, String> call(TableColumn<Serie, String> p) {
+				return new TableCell<Serie, String>() {
+
+					@Override
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						if (!isEmpty()) {
+							Serie serie = (Serie) this.getTableRow().getItem();
+							if (serie.hasUnwatchedEpisode()){								
+								this.setTextFill(Color.RED);
+							}else {
+								this.setTextFill(DEFAULT_ROW_FONT_COLOR);
+							}
+							setText(item);
+						}else{
+							setText("");
+						}
+					}
+				};
+
+			}
+		});
 	}
 
 	@FXML protected void handleSubmitButtonAction(ActionEvent event) {
@@ -494,6 +497,32 @@ public class FXMLButtonController{
 			e.printStackTrace();
 		}
 	}
+	
+	protected void handleSetLastEpisodeWatched(ActionEvent event, Serie serie) {
+		Parent root;
+		try {
+//			root = FXMLLoader.load(getClass().getResource("selectLastEpisodeWatched.fxml"));
+			FXMLLoader loader = new FXMLLoader(
+				    getClass().getResource("selectLastEpisodeWatched.fxml") );
+			root = loader.load();
+			
+			Stage stage = new Stage();
+			stage.setResizable(false);
+			stage.setTitle("Set Last Episode Watched");
+			stage.initModality(Modality.APPLICATION_MODAL);
+		    stage.initOwner(Main.mainStage.getScene().getWindow() );
+			stage.setScene(new Scene(root));
+			
+			LastEpisodeWatchedController controller = loader.<LastEpisodeWatchedController>getController();
+			controller.init(serie);
+			
+			stage.show();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 
 	@FXML
 	private void handleComboBoxAction() {

@@ -454,6 +454,7 @@ public class FXMLButtonController{
 								this.setFont(new Font(font.getFamily() + " Bold", this.getFont().getSize()));
 							}else {
 								this.setTextFill(DEFAULT_ROW_FONT_COLOR);
+								this.setFont(new Font("System", this.getFont().getSize()));
 							}
 							setText(item);
 						}else{

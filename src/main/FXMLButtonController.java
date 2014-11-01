@@ -46,6 +46,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -448,7 +449,9 @@ public class FXMLButtonController{
 						if (!isEmpty()) {
 							Serie serie = (Serie) this.getTableRow().getItem();
 							if (serie.hasUnwatchedEpisode()){								
-								this.setTextFill(Color.RED);
+								this.setTextFill(Color.BLACK);
+								Font font = this.getFont();
+								this.setFont(new Font(font.getFamily() + " Bold", this.getFont().getSize()));
 							}else {
 								this.setTextFill(DEFAULT_ROW_FONT_COLOR);
 							}

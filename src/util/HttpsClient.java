@@ -7,6 +7,8 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.zip.GZIPInputStream;
 
 import javafx.application.Platform;
@@ -122,9 +124,6 @@ public class HttpsClient {
 		}
 		return null;
 	}
-
-	private static WebView webview;
-	private static TorecWebEngineListener torecWebEngineListener;
 	
 	public static void openEpGuideLink(Serie serie) {
 		String link = AppConfigurations.getInstance().getSerieProperty(serie.getName(), AppConfigurations.EP_GUIDE_LINK_PROPERTY);
@@ -141,10 +140,20 @@ public class HttpsClient {
 		DONE;
 	}
 	
-	public static void openTorecSeriesLink(Serie serie) {
+	
+
+	// For keeping hard reference to objects
+	public static Queue<TorecWebEngineListener> webEngineQueue = new LinkedList<>();
+	private static boolean webEngineInProgress = false;
+	
+	public static void openTorecSeriesLink(Serie serie, boolean forceOpenWeb) {
 
 		String startLink = torecSerieLink;
 		TorecStage startTorecStage = TorecStage.SEARCH_PAGE;
+		
+		if (!forceOpenWeb && serie.getMissingSubsEpisodesList().isEmpty()) {
+			return;
+		}
 		
 		String torecSerieId = AppConfigurations.getInstance().getSerieProperty(serie.getName(), AppConfigurations.TOREC_SERIES_PROPERTY);
 		if (torecSerieId != null){
@@ -161,27 +170,41 @@ public class HttpsClient {
 		});
 		
 		try {
-			WebEngine webEngine = null;			
-			if (webview == null){
-				webview = new WebView();
-				webEngine = webview.getEngine();
-				webEngine.setJavaScriptEnabled(true);
-				
-				torecWebEngineListener = new TorecWebEngineListener(webEngine, startTorecStage, serie);
-				webEngine.getLoadWorker().stateProperty().addListener(
-						torecWebEngineListener);
-			}else{
-				webEngine = webview.getEngine();
-				torecWebEngineListener.init(startTorecStage, serie);
+			WebView webview = new WebView();
+			WebEngine webEngine = webview.getEngine();
+			webEngine.setJavaScriptEnabled(true);
+			
+			TorecWebEngineListener torecWebEngineListener = new TorecWebEngineListener(webview, startTorecStage, serie, forceOpenWeb, startLink);
+			webEngine.getLoadWorker().stateProperty().addListener(
+					torecWebEngineListener);
+			log.info("Adding to queue for series: " + serie.getName());
+			webEngineQueue.add(torecWebEngineListener);
+			
+			if (!webEngineInProgress) {						
+				startNextWebEngineLoad();
 			}
-			Main.setStatusTextOverride("Loading " + startLink);
-			webEngine.load(startLink);
+			
 
 		} catch (Exception ex) {
 			System.err.print("error " + ex.getMessage());
 			ex.printStackTrace();
 		}
 
+	}
+	
+	public static void setWebEngineInProgress(boolean webEngineInProgress) {
+		HttpsClient.webEngineInProgress = webEngineInProgress;
+	}
+
+	public static void startNextWebEngineLoad() {
+		if (!webEngineQueue.isEmpty()) {		
+			webEngineInProgress = true;
+			TorecWebEngineListener poll = webEngineQueue.poll();
+			log.info("Starting web engine for serie: " + poll.getSerie().getName());
+			String startLink = poll.getStartLink();
+			Main.setStatusTextOverride("Loading " + startLink);
+			poll.getWebEngine().load(startLink);
+		}
 	}
 
 }

@@ -77,6 +77,7 @@ public class FXMLButtonController{
 	@FXML private TableColumn<Serie, String> lastEpWatchedColumn;
 
 	@FXML private ComboBox<String> comboBox;
+	@FXML private HBox filterHBox;
 
 	private List<Serie> allData = null;
 	
@@ -258,7 +259,7 @@ public class FXMLButtonController{
 					public void handle(ActionEvent event) {
 						Serie serie = row.getItem();
 						
-						HttpsClient.openTorecSeriesLink(serie);
+						HttpsClient.openTorecSeriesLink(serie, true);
 					}
 					
 				});
@@ -422,7 +423,7 @@ public class FXMLButtonController{
 						super.updateItem(item, empty);
 						if (!isEmpty()) {
 							Serie serie = (Serie) this.getTableRow().getItem();
-							if (serie.hasAvailableNewEpisode()){								
+							if (serie != null && serie.hasAvailableNewEpisode()){								
 								this.setTextFill(Color.BLUE);
 							}else {
 								this.setTextFill(DEFAULT_ROW_FONT_COLOR);
@@ -448,7 +449,7 @@ public class FXMLButtonController{
 						super.updateItem(item, empty);
 						if (!isEmpty()) {
 							Serie serie = (Serie) this.getTableRow().getItem();
-							if (serie.hasUnwatchedEpisode()){								
+							if (serie != null && serie.hasUnwatchedEpisode()){								
 								this.setTextFill(Color.BLACK);
 								Font font = this.getFont();
 								this.setFont(new Font(font.getFamily() + " Bold", this.getFont().getSize()));
@@ -484,6 +485,13 @@ public class FXMLButtonController{
 		ObservableList<Serie> items = tableView.getItems();
 		for (Serie serie : items) {
 			downloadAllSeriesCandidates(serie);
+		}
+	}
+	
+	@FXML protected void handleDownloadAvailableSubsButton(ActionEvent event) {		
+		ObservableList<Serie> items = tableView.getItems();
+		for (Serie serie : items) {
+			HttpsClient.openTorecSeriesLink(serie, false);
 		}
 	}
 

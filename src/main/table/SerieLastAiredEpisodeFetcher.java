@@ -44,6 +44,9 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 			
 		try {
 			String link = getEpisodeGuideLink(name);
+			if (link == null) {
+				return;
+			}
 			
 			String readFromUrl = FileUtil.readFromUrl(link);
 			
@@ -125,26 +128,15 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 		List<EpisodeData> candidates = serie.getDownloadEpisodesCandidates();
 		for (EpisodeData episodeData : candidates) {			
 			String pirateBaySearchContent = HttpsClient.getPirateBaySearchContent(episodeData);
-			String magnetLink = getFirstMagnetLink(pirateBaySearchContent);
+			if (pirateBaySearchContent == null) {
+				continue;
+			}
+			String magnetLink = HttpsClient.getFirstMagnetLink(pirateBaySearchContent);
 			episodeData.setMagnetLink(magnetLink);
 		}
 		
 		serie.updateAvailableEpisodesForDownload();
 		
-	}
-
-	private String getFirstMagnetLink(String pirateBaySearchContent) {		
-		int indexOf = pirateBaySearchContent.indexOf("<div class=\"detName\">");
-		String link = null;
-		if (indexOf != -1){
-			pirateBaySearchContent = pirateBaySearchContent.substring(indexOf);
-			indexOf = pirateBaySearchContent.indexOf("magnet");
-			if (indexOf != -1){
-				int endIndex = pirateBaySearchContent.indexOf("\"", indexOf);
-				link = pirateBaySearchContent.substring(indexOf, endIndex).trim();
-			}
-		}
-		return link;
 	}
 
 	private String getEpisodeGuideLink(String serieName) {
@@ -155,6 +147,9 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 		// Getting the link for this serie in episode guide by searching the site using google
 		String readFromUrl = HttpsClient.getEpisodesGuideGoogleSearchContent(serieName);
 
+		if (readFromUrl == null) {
+			return null;
+		}
 		log.info("Read from EpGuide Search: " + readFromUrl);
 		 
 		

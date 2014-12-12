@@ -33,8 +33,15 @@ public class HttpsClient {
 	private final static String searchEpisodesURL = "https://www.googleapis.com/customsearch/v1?";
 
 	//base url for pirate bay search - descending by seeds
-	private final static String searchPirateBayUrl = "http://thepiratebay.se/search/";
-	private final static String searchPirateBayAttributes = "/0/7/200"; // first page / Descending by Seeds / Videos
+	private static final int ALL_URLS_DEAD = -2;
+	private static final int NOT_INITIALIZED = -1;
+	private static int pirateBayUrlIndex = NOT_INITIALIZED; // which url to use
+	private static boolean[] urlChecked = {false, false};
+	private static final String[] searchPirateBayConcatChar = {"%20", "+"};
+	private static final String[] searchPirateBayUrl = {"http://thepiratebay.se/search/", "http://oldpiratebay.org/search.php?q="};
+	private static final String[] searchPirateBayAttributes = {"/0/7/200",// first page / Descending by Seeds / Videos
+				"&iht=8&Torrent_sort=seeders.desc" // Series&TV  / Descending by Seeds
+	}; 
 
 	//TOREC search
 	public final static String torecDomain 	= "http://www.torec.net"; 
@@ -50,6 +57,9 @@ public class HttpsClient {
 	}
 
 	public static void openURL(String url){
+		if (url == null) {
+			return;
+		}
 		try {
 			java.awt.Desktop.getDesktop().browse(new URI(url));
 		} catch (IOException | URISyntaxException e) {
@@ -58,18 +68,76 @@ public class HttpsClient {
 	}
 
 	public static String makePirateBaySearchString(EpisodeData epData){
+		setAliveTorrentUrl();
+		if (pirateBayUrlIndex == ALL_URLS_DEAD) {
+			return null;
+		}
 		//replace spaces in the serie name with "%20"
 		String toSearch = "";
 		String keys[] = epData.getSerieName().split("[ ]+");
 		for(String key:keys){
-			toSearch += key +"%20"; //append the keywords to the url
+			toSearch += key + searchPirateBayConcatChar[pirateBayUrlIndex]; //append the keywords to the url
 		} 
 		// add the season and episode
 		toSearch += epData.toString();
 
-		toSearch = searchPirateBayUrl + toSearch + searchPirateBayAttributes;
+		toSearch = searchPirateBayUrl[pirateBayUrlIndex] + toSearch + searchPirateBayAttributes[pirateBayUrlIndex];
 
 		return toSearch;
+	}
+
+	private static synchronized void setAliveTorrentUrl() {
+		if (pirateBayUrlIndex == ALL_URLS_DEAD) {
+			return;
+		}
+		if (pirateBayUrlIndex == NOT_INITIALIZED) {
+			while (pirateBayUrlIndex <= searchPirateBayUrl.length) {
+				pirateBayUrlIndex++;
+				if (searchPirateBayUrl.length <= pirateBayUrlIndex) {
+					pirateBayUrlIndex = ALL_URLS_DEAD;
+				} else {				
+					URL url;
+					try {
+						url = new URL(searchPirateBayUrl[pirateBayUrlIndex]);
+						HttpURLConnection connection= (HttpURLConnection)url.openConnection();
+						connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+						connection.getInputStream();
+						return; // success - found an alive url
+					} catch (Exception e) {
+						log.error("Couldn't connect to " + searchPirateBayUrl[pirateBayUrlIndex], e);
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
+	public static String getFirstMagnetLink(String pirateBaySearchContent) {
+		String link = null;
+		if (pirateBayUrlIndex == 0) {
+			// regular pirate bay parse
+			int indexOf = pirateBaySearchContent.indexOf("<div class=\"detName\">");
+			if (indexOf != -1){
+				pirateBaySearchContent = pirateBaySearchContent.substring(indexOf);
+				indexOf = pirateBaySearchContent.indexOf("magnet");
+				if (indexOf != -1){
+					int endIndex = pirateBaySearchContent.indexOf("\"", indexOf);
+					link = pirateBaySearchContent.substring(indexOf, endIndex).trim();
+				}
+			}
+		} else {
+			// old pirate bay parse
+			int indexOf = pirateBaySearchContent.indexOf("<td class=\"title-row\">");
+			if (indexOf != -1){
+				pirateBaySearchContent = pirateBaySearchContent.substring(indexOf);
+				indexOf = pirateBaySearchContent.indexOf("magnet");
+				if (indexOf != -1){
+					int endIndex = pirateBaySearchContent.indexOf("' title='MAGNET LINK'", indexOf);
+					link = pirateBaySearchContent.substring(indexOf, endIndex).trim();
+				}
+			}
+		}
+		return link;
 	}
 
 	private static String makeEpisodeGuideSearchString(String qSearch,int start,int numOfResults)
@@ -99,6 +167,9 @@ public class HttpsClient {
 
 	private static String read(String pUrl)
 	{
+		if (pUrl == null) {
+			return null;
+		}
 		String newLine = System.getProperty("line.separator");
 		//pUrl is the URL we created in previous step
 		try

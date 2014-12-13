@@ -75,7 +75,13 @@ public class HttpsClient {
 		//replace spaces in the serie name with "%20"
 		String toSearch = "";
 		String keys[] = epData.getSerieName().split("[ ]+");
+		int wordCount = 0;
 		for(String key:keys){
+			wordCount++;
+			// if this is the last word (but not first) and it is a number - remove it from search string (i.e. Once upon a time 2011 - remove the 2011)
+			if (wordCount > 1 && wordCount == keys.length && key.matches("^[0-9]+$")) {
+				continue;
+			}
 			toSearch += key + searchPirateBayConcatChar[pirateBayUrlIndex]; //append the keywords to the url
 		} 
 		// add the season and episode

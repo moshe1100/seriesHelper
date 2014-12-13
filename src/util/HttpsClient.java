@@ -36,11 +36,11 @@ public class HttpsClient {
 	private static final int ALL_URLS_DEAD = -2;
 	private static final int NOT_INITIALIZED = -1;
 	private static int pirateBayUrlIndex = NOT_INITIALIZED; // which url to use
-	private static boolean[] urlChecked = {false, false};
-	private static final String[] searchPirateBayConcatChar = {"%20", "+"};
-	private static final String[] searchPirateBayUrl = {"http://thepiratebay.se/search/", "http://oldpiratebay.org/search.php?q="};
-	private static final String[] searchPirateBayAttributes = {"/0/7/200",// first page / Descending by Seeds / Videos
-				"&iht=8&Torrent_sort=seeders.desc" // Series&TV  / Descending by Seeds
+	private static final String[] searchPirateBayConcatChar = {"+", "%20"};
+	private static final String[] searchPirateBayUrl = {"http://oldpiratebay.org/search.php?q=", "http://thepiratebay.se/search/"};
+	private static final String[] searchPirateBayAttributes = {
+				 "&iht=8&Torrent_sort=seeders.desc", // Series&TV  / Descending by Seeds
+				 "/0/7/200"// first page / Descending by Seeds / Videos
 	}; 
 
 	//TOREC search
@@ -97,15 +97,20 @@ public class HttpsClient {
 					pirateBayUrlIndex = ALL_URLS_DEAD;
 				} else {				
 					URL url;
+					HttpURLConnection connection = null;
 					try {
 						url = new URL(searchPirateBayUrl[pirateBayUrlIndex]);
-						HttpURLConnection connection= (HttpURLConnection)url.openConnection();
+						connection= (HttpURLConnection)url.openConnection();
 						connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 						connection.getInputStream();
+						connection.disconnect();
 						return; // success - found an alive url
 					} catch (Exception e) {
-						log.error("Couldn't connect to " + searchPirateBayUrl[pirateBayUrlIndex], e);
-						e.printStackTrace();
+						if (connection != null && e.getMessage().equalsIgnoreCase("Already Connected")) {
+							connection.disconnect();
+						} else {							
+							log.error("Couldn't connect to " + searchPirateBayUrl[pirateBayUrlIndex], e);
+						}
 					}
 				}
 			}
@@ -114,7 +119,7 @@ public class HttpsClient {
 	
 	public static String getFirstMagnetLink(String pirateBaySearchContent) {
 		String link = null;
-		if (pirateBayUrlIndex == 0) {
+		if (pirateBayUrlIndex == 1) {
 			// regular pirate bay parse
 			int indexOf = pirateBaySearchContent.indexOf("<div class=\"detName\">");
 			if (indexOf != -1){
@@ -189,9 +194,10 @@ public class HttpsClient {
 			while((line=br.readLine())!=null){
 				buffer.append(line).append(newLine);
 			}
+			connection.disconnect();
 			return buffer.toString();
 		}catch(Exception e){
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return null;
 	}

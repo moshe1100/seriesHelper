@@ -2,6 +2,7 @@ package util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -36,11 +37,11 @@ public class HttpsClient {
 	private static final int ALL_URLS_DEAD = -2;
 	private static final int NOT_INITIALIZED = -1;
 	private static int pirateBayUrlIndex = NOT_INITIALIZED; // which url to use
-	private static final String[] searchPirateBayConcatChar = {"+", "%20"};
-	private static final String[] searchPirateBayUrl = {"http://oldpiratebay.org/search.php?q=", "http://thepiratebay.se/search/"};
+	private static final String[] searchPirateBayConcatChar = {"%20", "+"};
+	private static final String[] searchPirateBayUrl = {"https://kickass.so/usearch/", "http://oldpiratebay.org/search.php?q="};
 	private static final String[] searchPirateBayAttributes = {
+				 "/?field=seeders&sorder=desc",// Descending by Seeds
 				 "&iht=8&Torrent_sort=seeders.desc", // Series&TV  / Descending by Seeds
-				 "/0/7/200"// first page / Descending by Seeds / Videos
 	}; 
 
 	//TOREC search
@@ -92,6 +93,7 @@ public class HttpsClient {
 		return toSearch;
 	}
 
+	@SuppressWarnings("unused")
 	private static synchronized void setAliveTorrentUrl() {
 		if (pirateBayUrlIndex == ALL_URLS_DEAD) {
 			return;
@@ -105,15 +107,24 @@ public class HttpsClient {
 					URL url;
 					HttpURLConnection connection = null;
 					try {
-						url = new URL(searchPirateBayUrl[pirateBayUrlIndex]);
-						connection= (HttpURLConnection)url.openConnection();
-						connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-						connection.getInputStream();
-						connection.disconnect();
+//						String fullAddress = searchPirateBayUrl[pirateBayUrlIndex];
+//						url = new URL(fullAddress);
+//						if (searchPirateBayUrl[pirateBayUrlIndex].startsWith("https")) {
+//							int pathStart = fullAddress.indexOf("/", 8);
+//							url = new URL("https", fullAddress.substring(8, pathStart), fullAddress.substring(pathStart));
+//						}
+//						connection= (HttpURLConnection)url.openConnection();
+//						connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+//						connection.connect();
+//						connection.getResponseCode();
+//						InputStream inputStream = connection.getInputStream();
+//						inputStream.close();
+//						connection.disconnect();
 						return; // success - found an alive url
 					} catch (Exception e) {
 						if (connection != null && e.getMessage().equalsIgnoreCase("Already Connected")) {
 							connection.disconnect();
+							return; // success - found an alive url
 						} else {							
 							log.error("Couldn't connect to " + searchPirateBayUrl[pirateBayUrlIndex], e);
 						}
@@ -125,11 +136,12 @@ public class HttpsClient {
 	
 	public static String getFirstMagnetLink(String pirateBaySearchContent) {
 		String link = null;
-		if (pirateBayUrlIndex == 1) {
+		if (pirateBayUrlIndex == 0) {
 			// regular pirate bay parse
-			int indexOf = pirateBaySearchContent.indexOf("<div class=\"detName\">");
+			String firstString = "Torrent magnet link\"";
+			int indexOf = pirateBaySearchContent.indexOf(firstString);
 			if (indexOf != -1){
-				pirateBaySearchContent = pirateBaySearchContent.substring(indexOf);
+				pirateBaySearchContent = pirateBaySearchContent.substring(indexOf + firstString.length());
 				indexOf = pirateBaySearchContent.indexOf("magnet");
 				if (indexOf != -1){
 					int endIndex = pirateBaySearchContent.indexOf("\"", indexOf);
@@ -190,10 +202,11 @@ public class HttpsClient {
 			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 			BufferedReader br;
 			String headerField = connection.getHeaderField("Content-Encoding");
+			InputStream inputStream = connection.getInputStream();
 			if (headerField != null && headerField.equals("gzip")){
-				br = new BufferedReader(new InputStreamReader(new GZIPInputStream(connection.getInputStream())));            
+				br = new BufferedReader(new InputStreamReader(new GZIPInputStream(inputStream)));            
 	        } else {
-	        	br = new BufferedReader(new InputStreamReader(connection.getInputStream()));            
+				br = new BufferedReader(new InputStreamReader(inputStream));            
 	        }  
 			String line;
 			StringBuffer buffer=new StringBuffer();

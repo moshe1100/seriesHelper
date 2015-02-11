@@ -38,7 +38,7 @@ public class HttpsClient {
 	private static final int NOT_INITIALIZED = -1;
 	private static int pirateBayUrlIndex = NOT_INITIALIZED; // which url to use
 	private static final String[] searchPirateBayConcatChar = {"%20", "+"};
-	private static final String[] searchPirateBayUrl = {"https://kickass.so/usearch/", "http://oldpiratebay.org/search.php?q="};
+	private static final String[] searchPirateBayUrl = {"https://kickass.to/usearch/", "http://oldpiratebay.org/search.php?q="};
 	private static final String[] searchPirateBayAttributes = {
 				 "/?field=seeders&sorder=desc",// Descending by Seeds
 				 "&iht=8&Torrent_sort=seeders.desc", // Series&TV  / Descending by Seeds

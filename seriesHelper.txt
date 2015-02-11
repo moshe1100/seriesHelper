@@ -47,6 +47,7 @@ House_EP_GUIDE_LINK=http://epguides.com/House/
 House_SERIES_ENDED=true
 How I Met Your Mother_EP_GUIDE_LINK=http://epguides.com/HowIMetYourMother/
 How I Met Your Mother_SERIES_ENDED=true
+How to Get Away with Murder_EP_GUIDE_LINK=http://epguides.com/HowtoGetAwaywithMurder/
 Masters of Sex_EP_GUIDE_LINK=http://epguides.com/MastersofSex/
 Once Upon a Time 2011_EP_GUIDE_LINK=http://epguides.com/OnceUponaTime/
 Once Upon a Time 2011_SERIES_LAST_EP_WATCHED=S04E05

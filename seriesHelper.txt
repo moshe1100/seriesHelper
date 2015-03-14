@@ -12,6 +12,7 @@ Almost Human_TOREC_SERIES_ID=1369
 American Horror Story_EP_GUIDE_LINK=http://epguides.com/AmericanHorrorStory/
 American Horror Story_SERIES_LAST_EP_WATCHED=S04E07
 American Horror Story_TOREC_SERIES_ID=1227
+Better Call Saul_EP_GUIDE_LINK=http://epguides.com/BetterCallSaul/
 Black Mirror_EP_GUIDE_LINK=http://epguides.com/BlackMirror/
 Black Mirror_SERIES_ENDED=true
 Breaking Bad_EP_GUIDE_LINK=http://epguides.com/BreakingBad/

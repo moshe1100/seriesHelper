@@ -37,9 +37,10 @@ public class HttpsClient {
 	private static final int ALL_URLS_DEAD = -2;
 	private static final int NOT_INITIALIZED = -1;
 	private static int pirateBayUrlIndex = NOT_INITIALIZED; // which url to use
-	private static final String[] searchPirateBayConcatChar = {"%20", "+"};
-	private static final String[] searchPirateBayUrl = {"https://kickass.to/usearch/", "http://oldpiratebay.org/search.php?q="};
+	private static final String[] searchPirateBayConcatChar = {"%20", "%20", "+"};
+	private static final String[] searchPirateBayUrl = {"https://thepiratebay.se/search/", "https://kickass.to/usearch/", "http://oldpiratebay.org/search.php?q="};
 	private static final String[] searchPirateBayAttributes = {
+				 "/0/7/200",// first page / Descending by Seeds / Videos
 				 "/?field=seeders&sorder=desc",// Descending by Seeds
 				 "&iht=8&Torrent_sort=seeders.desc", // Series&TV  / Descending by Seeds
 	}; 
@@ -136,7 +137,17 @@ public class HttpsClient {
 	
 	public static String getFirstMagnetLink(String pirateBaySearchContent) {
 		String link = null;
-		if (pirateBayUrlIndex == 0) {
+		if (pirateBaySearchContent.indexOf("href=\"magnet:") != -1) {
+			int indexOf = pirateBaySearchContent.indexOf("href=\"magnet:");
+			if (indexOf != -1) {
+				pirateBaySearchContent = pirateBaySearchContent.substring(indexOf);
+				indexOf = pirateBaySearchContent.indexOf("magnet");
+				if (indexOf != -1){
+					int endIndex = pirateBaySearchContent.indexOf("\" title=\"", indexOf);
+					link = pirateBaySearchContent.substring(indexOf, endIndex).trim();
+				}
+			}
+		} else if (pirateBaySearchContent.indexOf("Torrent magnet link\"") != -1) {
 			// regular pirate bay parse
 			String firstString = "Torrent magnet link\"";
 			int indexOf = pirateBaySearchContent.indexOf(firstString);

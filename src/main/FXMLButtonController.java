@@ -665,7 +665,7 @@ public class FXMLButtonController{
 				}
 			}else if (FileUtil.isSubtitlesFile(file)){
 				// remove suffix
-				subtitleFileNames.add(FileUtil.removeFileSuffix(file.getName(), ".HEB").toLowerCase());
+				subtitleFileNames.add(FileUtil.removeFileSuffix(file.getName(), ".HEB", ".he").toLowerCase());
 			}
 		}
 	}

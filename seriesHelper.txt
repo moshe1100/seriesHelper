@@ -41,6 +41,7 @@ Homeland_EP_GUIDE_LINK=http://epguides.com/Homeland/
 Homeland_SERIES_LAST_EP_WATCHED=S03E12
 Homeland_TOREC_SERIES_ID=1207
 House of Cards (2013)_EP_GUIDE_LINK=http://epguides.com/HouseofCards_2013/
+House of Cards 2013_EP_GUIDE_LINK=http://epguides.com/HouseofCards_2013/
 House of Cards_EP_GUIDE_LINK=http://epguides.com/HouseofCards_2013/
 House of Cards_SERIES_LAST_EP_WATCHED=S01E02
 House of Cards_TOREC_SERIES_ID=1315

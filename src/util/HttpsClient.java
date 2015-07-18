@@ -12,8 +12,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.zip.GZIPInputStream;
 
-import javafx.application.Platform;
-import javafx.scene.Cursor;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import main.Main;
@@ -269,12 +267,12 @@ public class HttpsClient {
 		}
 		
         
-		Platform.runLater(new Runnable() {
-		    @Override
-		    public void run() {
-		        Main.mainStage.getScene().setCursor(Cursor.WAIT);
-		    }
-		});
+//		Platform.runLater(new Runnable() {
+//		    @Override
+//		    public void run() {
+//		        Main.mainStage.getScene().setCursor(Cursor.WAIT);
+//		    }
+//		});
 		
 		try {
 			WebView webview = new WebView();

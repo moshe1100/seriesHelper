@@ -158,9 +158,11 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 		
 		//Get the root object for the response
 		EpisodeGuideJSON ex = gson.fromJson(reader, EpisodeGuideJSON.class);
-		Item firstResult = ex.getItems().iterator().next();
-		link = firstResult.getLink();
-		AppConfigurations.getInstance().setSerieProperty(serieName, AppConfigurations.EP_GUIDE_LINK_PROPERTY, link);
+		Item firstResult = ex.getItems().isEmpty() ? null : ex.getItems().iterator().next();
+		if (firstResult != null) {			
+			link = firstResult.getLink();
+			AppConfigurations.getInstance().setSerieProperty(serieName, AppConfigurations.EP_GUIDE_LINK_PROPERTY, link);
+		}
 		return link;
 	}
 

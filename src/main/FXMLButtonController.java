@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.apache.log4j.Logger;
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -56,9 +58,6 @@ import javafx.util.Duration;
 import main.properties.AppConfigurations;
 import main.table.Serie;
 import main.table.SerieLastAiredEpisodeFetcher;
-
-import org.apache.log4j.Logger;
-
 import util.EpisodeData;
 import util.FileUtil;
 import util.HttpsClient;
@@ -151,20 +150,22 @@ public class FXMLButtonController{
 		}
 		List<EpisodeData> nextEpisodesToBeAired = new LinkedList<>();
 		// updating the next series to be aired
-		for (Serie serie : allData){
-			EpisodeData nextEpisodeToBeAiredForSerie = serie.getNextEpisodeToBeAired();
-			if (nextEpisodeToBeAiredForSerie != null){
-				if (nextEpisodesToBeAired.isEmpty()){
-					nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
-				} else {
-					EpisodeData first = nextEpisodesToBeAired.iterator().next();
-					if (first.getAirDate().compareTo(nextEpisodeToBeAiredForSerie.getAirDate()) == 0){
-						// same date - add it to list
+		if (allData != null) {			
+			for (Serie serie : allData){
+				EpisodeData nextEpisodeToBeAiredForSerie = serie.getNextEpisodeToBeAired();
+				if (nextEpisodeToBeAiredForSerie != null){
+					if (nextEpisodesToBeAired.isEmpty()){
 						nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
-					}else if (first.getAirDate().after(nextEpisodeToBeAiredForSerie.getAirDate())){
-						// clear the list - found earlier 
-						nextEpisodesToBeAired.clear();
-						nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
+					} else {
+						EpisodeData first = nextEpisodesToBeAired.iterator().next();
+						if (first.getAirDate().compareTo(nextEpisodeToBeAiredForSerie.getAirDate()) == 0){
+							// same date - add it to list
+							nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
+						}else if (first.getAirDate().after(nextEpisodeToBeAiredForSerie.getAirDate())){
+							// clear the list - found earlier 
+							nextEpisodesToBeAired.clear();
+							nextEpisodesToBeAired.add(nextEpisodeToBeAiredForSerie);
+						}
 					}
 				}
 			}

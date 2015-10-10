@@ -7,6 +7,9 @@ import java.util.List;
 public class Util {
 
 	public static boolean isNumeric(String str) {
+		if (str.endsWith(".")) {
+			str = str.substring(0, str.length()-1);
+		}
 		return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
 	}
 	

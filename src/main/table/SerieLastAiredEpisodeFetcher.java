@@ -8,10 +8,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import main.properties.AppConfigurations;
-
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import main.properties.AppConfigurations;
 import util.Constants;
 import util.EpisodeData;
 import util.FileUtil;
@@ -19,9 +21,6 @@ import util.HttpsClient;
 import util.Util;
 import util.json.EpisodeGuideJSON;
 import util.json.Item;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class SerieLastAiredEpisodeFetcher implements Runnable {
 	private static Logger log = Logger.getLogger(SerieLastAiredEpisodeFetcher.class);
@@ -85,9 +84,12 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 					int separatorIndex = seasonAndEpisode.indexOf("-");
 					int season = Integer.parseInt(seasonAndEpisode.substring(0, separatorIndex));
 					int epNumber = Integer.parseInt(seasonAndEpisode.substring(separatorIndex+1));
-					String airDateStr = split[3].contains("/") ? split[3] : split[2];
+					int dateStartIndex = 3;
+					String airDateStr = split[dateStartIndex].contains("/") ? split[dateStartIndex] /*3*/: split[--dateStartIndex] /*2*/;
 					if (!Util.isDigit(airDateStr.charAt(0)) ){ // probably no day (i.e. Sep/14) - adding "01/"
 						airDateStr = "01/" + airDateStr;
+					} else if (!airDateStr.contains("/")) { // probably date is splitted to 3 cells i.e. 24 Mar 08
+						airDateStr = airDateStr + "/" + split[dateStartIndex+1] + "/" + split[dateStartIndex+2];
 					}
 					Date airDate = null;
 					try{

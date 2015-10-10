@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="Cp1255" standalone="no"?>
 <jardesc>
-    <jar path="C:/Users/Moshe/Videos/SeriesHelper/SeriesHelper.jar"/>
+    <jar path="D:/Users/Moshe/Videos/SeriesHelper/SeriesHelper.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/seriesHelper/jarCreate.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -11,10 +11,10 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <file path="/seriesHelper/README.md"/>
         <folder path="/seriesHelper/lib"/>
         <file path="/seriesHelper/log4j.xml"/>
-        <file path="/seriesHelper/icon.ico"/>
         <javaElement handleIdentifier="=seriesHelper/src"/>
+        <file path="/seriesHelper/README.md"/>
+        <file path="/seriesHelper/icon.ico"/>
     </selectedElements>
 </jardesc>

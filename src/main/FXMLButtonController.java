@@ -48,10 +48,8 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -73,7 +71,6 @@ public class FXMLButtonController{
 	@FXML private TableColumn<Serie, String> nameColumn;
 	@FXML private TableColumn<Serie, String> nextEpAirDateColumn;
 	@FXML private TableColumn<Serie, String> availableEpForDownloadColumn;
-	@FXML private TableColumn<Serie, String> lastEpWatchedColumn;
 
 	@FXML private ComboBox<String> comboBox;
 	@FXML private HBox filterHBox;
@@ -232,13 +229,6 @@ public class FXMLButtonController{
 						Serie item = row.getItem();
 						item.setSeriesEnded(!item.isEnded());
 						handleComboBoxAction();
-					}
-				});
-				setLastEpWatchedItem.setOnAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-						Serie item = row.getItem();
-						handleSetLastEpisodeWatched(event, item);
 					}
 				});
 				rowMenu.getItems().addAll(openItem, ignoreMissingSubsItem, markAsEndedItem, setLastEpWatchedItem);
@@ -438,35 +428,6 @@ public class FXMLButtonController{
 
 			}
 		});
-		// paint in red if last episode watched is smaller then last episode on disk
-		lastEpWatchedColumn.setCellFactory(new Callback<TableColumn<Serie, String>, TableCell<Serie, String>>() {
-
-			@Override
-			public TableCell<Serie, String> call(TableColumn<Serie, String> p) {
-				return new TableCell<Serie, String>() {
-
-					@Override
-					public void updateItem(String item, boolean empty) {
-						super.updateItem(item, empty);
-						if (!isEmpty()) {
-							Serie serie = (Serie) this.getTableRow().getItem();
-							if (serie != null && serie.hasUnwatchedEpisode()){								
-								this.setTextFill(Color.BLACK);
-								Font font = this.getFont();
-								this.setFont(new Font(font.getFamily() + " Bold", this.getFont().getSize()));
-							}else {
-								this.setTextFill(DEFAULT_ROW_FONT_COLOR);
-								this.setFont(new Font("System", this.getFont().getSize()));
-							}
-							setText(item);
-						}else{
-							setText("");
-						}
-					}
-				};
-
-			}
-		});
 	}
 
 	@FXML protected void handleSubmitButtonAction(ActionEvent event) {
@@ -511,32 +472,6 @@ public class FXMLButtonController{
 		}
 	}
 	
-	protected void handleSetLastEpisodeWatched(ActionEvent event, Serie serie) {
-		Parent root;
-		try {
-//			root = FXMLLoader.load(getClass().getResource("selectLastEpisodeWatched.fxml"));
-			FXMLLoader loader = new FXMLLoader(
-				    getClass().getResource("selectLastEpisodeWatched.fxml") );
-			root = loader.load();
-			
-			Stage stage = new Stage();
-			stage.setResizable(false);
-			stage.setTitle("Set Last Episode Watched");
-			stage.initModality(Modality.APPLICATION_MODAL);
-		    stage.initOwner(Main.mainStage.getScene().getWindow() );
-			stage.setScene(new Scene(root));
-			
-			LastEpisodeWatchedController controller = loader.<LastEpisodeWatchedController>getController();
-			controller.init(serie);
-			
-			stage.show();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-
 	@FXML
 	private void handleComboBoxAction() {
 		String selectedItem = comboBox.getSelectionModel().getSelectedItem();

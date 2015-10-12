@@ -32,7 +32,6 @@ public class AppConfigurations {
 	public static final String IGNORE_MISSING_SUBS_SERIES_PROPERTY = "IGNORE_MISSING_SUBS_SERIES";
 	public static final String TOREC_SERIES_PROPERTY = "TOREC_SERIES_ID";
 	public static final String SERIES_ENDED_PROPERTY = "SERIES_ENDED";
-	public static final String SERIES_LAST_EP_WATCHED_PROPERTY = "SERIES_LAST_EP_WATCHED";
 	public static final String TABLE_SORT_ORDER = "TABLE_SORT_ORDER";
 
 	private Map<String, Properties> sectionsToProperties = new HashMap<>(); 

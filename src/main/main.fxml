@@ -53,11 +53,6 @@
                 <PropertyValueFactory property="lastEpAired" />
               </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="lastEpWatchedColumn" prefWidth="110.0" text="Last Ep. Watched">
-            	<cellValueFactory>
-	               <PropertyValueFactory property="lastEpisodeWatched" />
-              	</cellValueFactory>
-            </TableColumn>
             <TableColumn fx:id="nextEpAirDateColumn" maxWidth="5000.0" minWidth="10.0" prefWidth="99.0" text="Next Air Date">
               <cellValueFactory>
                 <PropertyValueFactory property="nextEpAirDate" />

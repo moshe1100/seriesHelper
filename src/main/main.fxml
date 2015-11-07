@@ -108,6 +108,7 @@
             </Button>
                   <Button mnemonicParsing="false" onAction="#handleDownloadAllButtonAction" text="Download Episodes" />
                   <Button mnemonicParsing="false" onAction="#handleDownloadAvailableSubsButton" text="Download Subs" />
+                  <Button mnemonicParsing="false" onAction="#handleReaarageFoldersButton" text="Rearrange Folders" />
           </children>
           <stylesheets>
             <URL value="@Login.css" />

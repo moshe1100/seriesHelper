@@ -456,6 +456,13 @@ public class FXMLButtonController{
 			HttpsClient.openTorecSeriesLink(serie, false);
 		}
 	}
+	
+	@FXML protected void handleReaarageFoldersButton(ActionEvent evnt) {
+		ObservableList<Serie> items = tableView.getItems();
+		for (Serie serie : items) {
+			serie.rearrangeFoldersAndFilenames();			
+		}
+	}
 
 	@FXML protected void handleAboutButtonAction(ActionEvent event) {
 		Parent root;
@@ -594,7 +601,7 @@ public class FXMLButtonController{
 		for (File file : seasonsList) {
 			if (file.isDirectory()){
 				fillEpisodesList(serieName, file, episodes, subtitleFileNames);
-			}else if (FileUtil.isVideoFile(file)){
+			}else if (FileUtil.isVideoFile(file) && isFileSizeInMBAtLeast(file, 50)){
 				EpisodeData epData = new EpisodeData(serieName, file);
 				if (epData.getEpisode() > 0){
 					episodes.add(epData);
@@ -604,6 +611,16 @@ public class FXMLButtonController{
 				subtitleFileNames.add(FileUtil.removeFileSuffix(file.getName(), ".HEB", ".he").toLowerCase());
 			}
 		}
+	}
+
+	// Returns true if this file size is at least the given size in MB
+	// used to skip the sample files
+	private boolean isFileSizeInMBAtLeast(File file, int desiredSizeInMB) {
+		// Get the number of bytes in the file
+		long sizeInBytes = file.length();
+		//transform in MB
+		long sizeInMb = sizeInBytes / (1024 * 1024);
+		return sizeInMb > desiredSizeInMB;
 	}
 
 	private void downloadAllSeriesCandidates(Serie serie) {		

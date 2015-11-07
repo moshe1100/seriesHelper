@@ -12,13 +12,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.log4j.Logger;
+
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import main.properties.AppConfigurations;
 import util.Constants;
 import util.EpisodeData;
+import util.FileUtil;
 
 public class Serie {
+	
+	private static Logger log = Logger.getLogger(Serie.class);
+	
 	private final SimpleStringProperty name = new SimpleStringProperty("");
 	private final SimpleStringProperty lastEpOnDisk = new SimpleStringProperty("");
 	private final SimpleStringProperty lastEpAired = new SimpleStringProperty("");
@@ -270,6 +276,71 @@ public class Serie {
 		}
 		
 	}
+
+	public void rearrangeFoldersAndFilenames() {
+		if (isEnded()) {
+			return;
+		}
+		
+		for (EpisodeData episodeData : episodesList) {
+			// getting the parent folder and checking if it is under a Season X folder
+			File episodeFile = episodeData.getEpisodeFile();
+			if (episodeFile == null) {
+				continue;
+			}
+			File parentFile = episodeFile.getParentFile();
+			if (!parentFile.getName().toLowerCase().contains("season")) {
+				// episode file is not under the "Season X" folder 
+				// making sure the Season folder is one folder up from parent folder
+				File seasonFolder = parentFile.getParentFile();
+				if (seasonFolder.getName().toLowerCase().contains("season")) {
+					// need to move this file one folder up (only on closed files)
+					if (episodeFile.canWrite()) {
+						// creating a new file in the parent folder
+						File newFile = new File(seasonFolder, getFixedName(episodeData));
+						log.info("Moving " + episodeFile + " to " + newFile);
+						episodeFile.renameTo(newFile);
+						log.info("Deleting folder: " + parentFile);
+						FileUtil.deleteDir(parentFile);
+					}
+				}
+			}
+		}
+	}
+
+	// Capitalizing Name and fixing the episode name
+	// i.e. the.big.bang.theory.904.hdtv-lol[ettv].mp4 -> The.Big.Bang.Theory.S09E04.hdtv-lol[ettv].mp4
+	private String getFixedName(EpisodeData episodeData) {
+		// replacing the spaces with dots
+		StringBuilder newName = new StringBuilder().append(episodeData.getSerieName().replace(" ", ".")).append(".");
+		// adding the episode name
+		newName.append("S" + addLeadingZeros(episodeData.getSeason(), 2)).append("E" + addLeadingZeros(episodeData.getEpisode(), 2));
+		if (episodeData.isDoubleEpisode() ){
+			newName.append("E" + addLeadingZeros(episodeData.getDoubleEpisode(), 2));
+		}
+		// adding the rest of the file name
+		String oldName = episodeData.getEpisodeFile().getName();
+		newName.append(getFixedRestName(episodeData, oldName));
+			
+		return newName.toString();		
+	}
+
+	// fixing the rest of the file name
+	// i.e. hdtv.x264-killers -> HDTV.x264-KILLERS
+	private String getFixedRestName(EpisodeData episodeData, String oldName) {
+		String name = oldName.substring(episodeData.getIndexAfterEpisodeInFileName()).toUpperCase();
+		name.replace("X264", "x264");
+		return name;
+	}
+
+	private String addLeadingZeros(int number, int totalLength) {
+		String result = Integer.toString(number);
+		while (result.length() < totalLength) {
+			result = "0" + result;
+		}
+		return result;
+	}
+	
 
 
 }

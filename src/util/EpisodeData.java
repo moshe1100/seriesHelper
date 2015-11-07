@@ -26,6 +26,7 @@ public class EpisodeData implements Comparable<EpisodeData>{
 	private int season;
 	private int episode; // the ep number (or the first one if double)
 	private int doubleEpisode; // the second episode number for double episode
+	private int indexAfterEpisodeInFileName = -1;
 	
 	private File episodeFile;
 	
@@ -57,20 +58,26 @@ public class EpisodeData implements Comparable<EpisodeData>{
 			if (simpleEpisodeMatcher.matches()) {
 				season  = Integer.parseInt(simpleEpisodeMatcher.group(1));
 			    episode = Integer.parseInt(simpleEpisodeMatcher.group(2));
+			    // getting the index right after the episode name
+			    indexAfterEpisodeInFileName = simpleEpisodeMatcher.end(2);
 			} else if (doubleEpisodeMatcher.matches()){
 				season  = Integer.parseInt(doubleEpisodeMatcher.group(2));
 			    episode = Integer.parseInt(doubleEpisodeMatcher.group(3));
 			    doubleEpisode = Integer.parseInt(doubleEpisodeMatcher.group(4));
+			    indexAfterEpisodeInFileName = doubleEpisodeMatcher.end(4);
 			} else if (singleEpisodeMatcher.matches()){
 				season  = Integer.parseInt(singleEpisodeMatcher.group(2));
 			    episode = Integer.parseInt(singleEpisodeMatcher.group(3));
+			    indexAfterEpisodeInFileName = singleEpisodeMatcher.end(3);
 			} else if (specialEpisodeMatcher.matches()){
 				season  = Integer.parseInt(specialEpisodeMatcher.group(2));
 			    episode = 0;
+			    indexAfterEpisodeInFileName = specialEpisodeMatcher.end(2);
 			} else if (singleEpisodeMatcherNoSeperator.matches()) {
 				String group = singleEpisodeMatcherNoSeperator.group(2);
 				season  = Integer.parseInt(group.substring(0, group.length()-2));
 				episode = Integer.parseInt(group.substring(group.length()-2));
+				indexAfterEpisodeInFileName = singleEpisodeMatcherNoSeperator.end(2);
 			}else {
 				// Try to get season/episode from 1x02 form
 				String currentText = "";
@@ -87,6 +94,7 @@ public class EpisodeData implements Comparable<EpisodeData>{
 					} else if (!currentText.isEmpty() && setEpisode){
 						// setting episode (current char is not digit and we got episode number
 						episode = Integer.parseInt(currentText);
+						indexAfterEpisodeInFileName = charAt;
 						break;
 					} else if (!currentText.isEmpty()){
 						// false alarm - reset
@@ -132,6 +140,14 @@ public class EpisodeData implements Comparable<EpisodeData>{
 	
 	public int getDoubleEpisode() {
 		return doubleEpisode;
+	}
+	
+	public boolean isDoubleEpisode() {
+		return doubleEpisode > 0;
+	}
+	
+	public int getIndexAfterEpisodeInFileName() {
+		return indexAfterEpisodeInFileName;
 	}
 	
 	public int getLastEpisodeNumber(){

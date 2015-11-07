@@ -26,6 +26,7 @@ public class FileUtil {
 		movieSuffix.add("mp4");
 		movieSuffix.add("mkv");
 		movieSuffix.add("mov");
+		movieSuffix.add("wmv");
 	}
 	
 	public static Set<String> subsSuffix = new HashSet<>();
@@ -105,6 +106,39 @@ public class FileUtil {
 		return subsSuffix.contains(suffix);
 	}
 	
+	public static String removeFileSuffix(String name, String... additonalSuffixToRemove) {
+		int indexOf = name.lastIndexOf(".");
+		String newName = name;
+		if (indexOf != -1){			
+			newName = name.substring(0, indexOf);
+		}
+		if (additonalSuffixToRemove != null){				
+			for (String suffix : additonalSuffixToRemove) {				
+				newName = newName.replace(suffix, "");
+				newName = newName.replace(suffix.toLowerCase(), "");
+			}
+		}
+		return newName;
+	}
+	
+	public static boolean deleteDir(File dir) 
+	{ 
+		if (dir.isDirectory()) 
+		{ 
+			String[] children = dir.list(); 
+			for (int i=0; i<children.length; i++)
+			{ 
+				boolean success = deleteDir(new File(dir, children[i])); 
+				if (!success) 
+				{  
+					return false; 
+				} 
+			} 
+		}  
+		// The directory is now empty or this is a file so delete it 
+		return dir.delete(); 
+	} 
+	
 	//////////////// PRIVATE Methods //////////////////////////////////////////
 
 	private static void addSeriesFolder(List<File> folders, File rootFolder) {
@@ -135,21 +169,6 @@ public class FileUtil {
 			return file.getName().substring(indexOf+1);
 		}
 		return "";
-	}
-	
-	public static String removeFileSuffix(String name, String... additonalSuffixToRemove) {
-		int indexOf = name.lastIndexOf(".");
-		String newName = name;
-		if (indexOf != -1){			
-			newName = name.substring(0, indexOf);
-		}
-		if (additonalSuffixToRemove != null){				
-			for (String suffix : additonalSuffixToRemove) {				
-				newName = newName.replace(suffix, "");
-				newName = newName.replace(suffix.toLowerCase(), "");
-			}
-		}
-		return newName;
 	}
 	
 	////////////////////////////////////////////////////////////////

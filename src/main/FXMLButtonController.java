@@ -597,6 +597,7 @@ public class FXMLButtonController{
 	}
 
 	private void fillEpisodesList(String serieName, File serieFolder, List<EpisodeData> episodes, Set<String> subtitleFileNames) {
+		log.info("Init Serie episodes from disk for: " + serieName);
 		List<File> seasonsList = Arrays.asList(serieFolder.listFiles());
 		for (File file : seasonsList) {
 			if (file.isDirectory()){

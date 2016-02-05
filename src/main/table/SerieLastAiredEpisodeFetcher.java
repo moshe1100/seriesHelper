@@ -40,7 +40,9 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 		if (serie.isEnded()){
 			return; // no need to check for new episodes
 		}
-			
+		
+		log.info("Stating Last Aired Episode Fetch for serie: " + name);
+		
 		try {
 			String link = getEpisodeGuideLink(name);
 			if (link == null) {

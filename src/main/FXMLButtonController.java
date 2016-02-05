@@ -62,6 +62,7 @@ import util.HttpsClient;
 import util.Util;
 
 public class FXMLButtonController{
+	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(FXMLButtonController.class);
 	
 	private static final Color DEFAULT_ROW_FONT_COLOR = new Color(0.2,0.2,0.2,1);
@@ -596,7 +597,6 @@ public class FXMLButtonController{
 	}
 
 	private void fillEpisodesList(String serieName, File serieFolder, List<EpisodeData> episodes, Set<String> subtitleFileNames) {
-		log.info("Init Serie episodes from disk for: " + serieName);
 		List<File> seasonsList = Arrays.asList(serieFolder.listFiles());
 		for (File file : seasonsList) {
 			if (file.isDirectory()){

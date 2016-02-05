@@ -41,7 +41,7 @@ public class SerieLastAiredEpisodeFetcher implements Runnable {
 			return; // no need to check for new episodes
 		}
 		
-		log.info("Stating Last Aired Episode Fetch for serie: " + name);
+		log.info("Starting Last Aired Episode Fetch for serie: " + name);
 		
 		try {
 			String link = getEpisodeGuideLink(name);

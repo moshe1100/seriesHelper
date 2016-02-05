@@ -329,7 +329,10 @@ public class Serie {
 	// i.e. hdtv.x264-killers -> HDTV.x264-KILLERS
 	private String getFixedRestName(EpisodeData episodeData, String oldName) {
 		String name = oldName.substring(episodeData.getIndexAfterEpisodeInFileName()).toUpperCase();
-		name.replace("X264", "x264");
+		name = name.replace("X264", "x264").replace("[ETTV]", "").replace("[VTV]", "");
+		// lower case for file suffix
+		String suffix = FileUtil.getFileSuffix(name);
+		name = name.substring(0, name.length()-suffix.length()) + suffix.toLowerCase();
 		return name;
 	}
 

@@ -98,7 +98,7 @@ public class FileUtil {
 	
 	public static boolean isVideoFile(File file) {
 		String suffix = getFileSuffix(file);
-		return movieSuffix.contains(suffix);
+		return movieSuffix.contains(suffix.toLowerCase());
 	}
 	
 	public static boolean isSubtitlesFile(File file) {
@@ -164,13 +164,17 @@ public class FileUtil {
 	}
 
 	private static String getFileSuffix(File file) {
-		int indexOf = file.getName().lastIndexOf(".");
+		return getFileSuffix(file.getName());
+	}
+	
+	public static String getFileSuffix(String name) {
+		int indexOf = name.lastIndexOf(".");
 		if (indexOf > 0){
-			return file.getName().substring(indexOf+1);
+			return name.substring(indexOf+1);
 		}
 		return "";
 	}
-	
+
 	////////////////////////////////////////////////////////////////
 
 	public static class DirectoryFilter implements FileFilter {

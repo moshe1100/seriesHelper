@@ -62,7 +62,6 @@ import util.HttpsClient;
 import util.Util;
 
 public class FXMLButtonController{
-	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(FXMLButtonController.class);
 	
 	private static final Color DEFAULT_ROW_FONT_COLOR = new Color(0.2,0.2,0.2,1);
